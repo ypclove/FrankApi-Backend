@@ -1,0 +1,12 @@
+package com.frank.apibackstage.service;
+
+import com.baomidou.mybatisplus.extension.service.IService;
+import com.frank.apibackstage.model.entity.ProductOrder;
+
+/**
+ * @author Frank
+ * @data 2024/06/22
+ */
+public interface ProductOrderService extends IService<ProductOrder> {
+
+}
