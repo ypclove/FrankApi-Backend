@@ -4,10 +4,8 @@ import com.frank.apicommon.config.EmailConfig;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.mail.javamail.MimeMessageHelper;
 
-import javax.mail.MessagingException;
-import javax.mail.internet.MimeMessage;
+import javax.annotation.Resource;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -25,6 +23,12 @@ import static com.frank.apicommon.constant.EmailConstant.*;
 @Slf4j
 public class EmailUtil {
 
+    @Resource
+    private EmailConfig emailConfig;
+
+    @Resource
+    private JavaMailSender mailSender;
+
     /**
      * 生成普通电子邮件内容
      *
@@ -32,7 +36,7 @@ public class EmailUtil {
      * @param emailHtmlPath 电子邮件 html 路径
      * @return 邮件内容
      */
-    public String buildEmailContent(String emailHtmlPath, String captcha) {
+    public static String buildEmailContent(String emailHtmlPath, String captcha) {
         // 加载邮件 html 模板
         ClassPathResource resource = new ClassPathResource(emailHtmlPath);
         InputStream inputStream = null;
@@ -46,20 +50,20 @@ public class EmailUtil {
                 buffer.append(line);
             }
         } catch (Exception e) {
-            log.info("发送邮件读取模板失败{}", e.getMessage());
+            log.info("发送邮件读取模板失败：{}", e.getMessage());
         } finally {
             if (fileReader != null) {
                 try {
                     fileReader.close();
                 } catch (IOException e) {
-                    e.printStackTrace();
+                    log.error("exception message：", e);
                 }
             }
             if (inputStream != null) {
                 try {
                     inputStream.close();
                 } catch (IOException e) {
-                    e.printStackTrace();
+                    log.error("exception message：", e);
                 }
             }
         }
@@ -76,7 +80,7 @@ public class EmailUtil {
      * @param orderTotal    订单总额
      * @return 邮件内容
      */
-    public String buildPaySuccessEmailContent(String emailHtmlPath, String orderName, String orderTotal) {
+    public static String buildPaySuccessEmailContent(String emailHtmlPath, String orderName, String orderTotal) {
         // 加载邮件 html 模板
         ClassPathResource resource = new ClassPathResource(emailHtmlPath);
         InputStream inputStream = null;
@@ -90,45 +94,24 @@ public class EmailUtil {
                 buffer.append(line);
             }
         } catch (Exception e) {
-            log.info("发送邮件读取模板失败{}", e.getMessage());
+            log.error("发送邮件读取模板失败：{}", e.getMessage());
         } finally {
             if (fileReader != null) {
                 try {
                     fileReader.close();
                 } catch (IOException e) {
-                    throw new RuntimeException(e);
+                    log.error("exception message：", e);
                 }
             }
             if (inputStream != null) {
                 try {
                     inputStream.close();
                 } catch (IOException e) {
-                    e.printStackTrace();
+                    log.error("exception message：", e);
                 }
             }
         }
         // 替换 html 模板中的参数
         return MessageFormat.format(buffer.toString(), orderName, orderTotal, PLATFORM_RESPONSIBLE_PERSON, PATH_ADDRESS, EMAIL_TITLE);
-    }
-
-    /**
-     * 发送支付成功电子邮件
-     *
-     * @param emailAccount 电子邮件帐户
-     * @param mailSender   邮件发件人
-     * @param emailConfig  电子邮件配置
-     * @param orderName    订单名称
-     * @param orderTotal   订单总额
-     * @throws MessagingException 消息传递异常
-     */
-    public void sendPaySuccessEmail(String emailAccount, JavaMailSender mailSender, EmailConfig emailConfig, String orderName, String orderTotal) throws MessagingException {
-        MimeMessage message = mailSender.createMimeMessage();
-        // 邮箱发送内容组成
-        MimeMessageHelper helper = new MimeMessageHelper(message, true);
-        helper.setSubject("【" + EMAIL_TITLE + "】感谢您的购买，请查收您的订单");
-        helper.setText(buildPaySuccessEmailContent(EMAIL_HTML_PAY_SUCCESS_PATH, orderName, orderTotal), true);
-        helper.setTo(emailAccount);
-        helper.setFrom(EMAIL_TITLE + '<' + emailConfig.getEmailFrom() + '>');
-        mailSender.send(message);
     }
 }

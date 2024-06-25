@@ -9,6 +9,11 @@ package com.frank.apicommon.constant;
 public class EmailConstant {
 
     /**
+     * 合法邮箱校验模式
+     */
+    public static final String EMAIL_PATTERN = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$";
+
+    /**
      * 电子邮件 html 内容路径：resources 目录下
      */
     public static final String EMAIL_HTML_CONTENT_PATH = "email.html";
@@ -19,11 +24,6 @@ public class EmailConstant {
     public static final String EMAIL_HTML_PAY_SUCCESS_PATH = "pay.html";
 
     /**
-     * captcha缓存键
-     */
-    public static final String CAPTCHA_CACHE_KEY = "api:captcha:";
-
-    /**
      * 电子邮件主题
      */
     public static final String EMAIL_SUBJECT = "验证码邮件";
@@ -31,7 +31,7 @@ public class EmailConstant {
     /**
      * 电子邮件标题
      */
-    public static final String EMAIL_TITLE = "FrankApi 接口开放平台";
+    public static final String EMAIL_TITLE = "FrankApi接口开放平台";
 
     /**
      * 电子邮件标题英语
@@ -44,12 +44,12 @@ public class EmailConstant {
     public static final String PLATFORM_RESPONSIBLE_PERSON = "Frank";
 
     /**
-     * 平台地址
+     * TODO: 平台地址
      */
     public static final String PLATFORM_ADDRESS = "<a href='https://baidu.com/'>请联系我们</a>";
 
     /**
-     * 路径地址
+     * TODO: 路径地址
      */
     public static final String PATH_ADDRESS = "'https://baidu.com/'";
 }

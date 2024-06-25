@@ -29,37 +29,18 @@ public class BaseResponse<T> implements Serializable {
     /**
      * 提示消息
      */
-    private String message;
+    private String msg;
 
     /**
      * 全参构造器
      *
-     * @param code    状态码
-     * @param data    响应数据
-     * @param message 提示消息
-     */
-    public BaseResponse(int code, T data, String message) {
-        this.code = code;
-        this.data = data;
-        this.message = message;
-    }
-
-    /**
-     * 请求成功通用返回
-     *
      * @param code 状态码
      * @param data 响应数据
+     * @param msg  提示消息
      */
-    public BaseResponse(int code, T data) {
-        this(code, data, "");
-    }
-
-    /**
-     * 请求失败通用返回
-     *
-     * @param errorCode 错误码
-     */
-    public BaseResponse(ErrorCode errorCode) {
-        this(errorCode.getCode(), null, errorCode.getMessage());
+    public BaseResponse(int code, T data, String msg) {
+        this.code = code;
+        this.data = data;
+        this.msg = msg;
     }
 }

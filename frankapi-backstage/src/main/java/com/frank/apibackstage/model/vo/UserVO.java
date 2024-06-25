@@ -6,7 +6,7 @@ import java.io.Serializable;
 import java.util.Date;
 
 /**
- * 用户视图
+ * 用户信息（脱敏）
  *
  * @author Frank
  * @date 2024/6/22
@@ -44,7 +44,7 @@ public class UserVO implements Serializable {
     private Integer status;
 
     /**
-     * 钱包余额（单位：分）
+     * 积分
      */
     private Integer balance;
 
@@ -71,12 +71,12 @@ public class UserVO implements Serializable {
     /**
      * 性别
      */
-    private String gender;
+    private Integer gender;
 
     /**
      * 用户角色: user / admin
      */
-    private String userRole;
+    private Integer userRole;
 
     /**
      * 创建时间

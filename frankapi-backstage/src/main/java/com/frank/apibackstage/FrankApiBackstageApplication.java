@@ -3,6 +3,7 @@ package com.frank.apibackstage;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
 /**
@@ -12,6 +13,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 // @EnableDubbo
 @EnableScheduling
 @SpringBootApplication
+@ComponentScan("com.frank")
 @MapperScan("com.frank.apibackstage.mapper")
 public class FrankApiBackstageApplication {
     public static void main(String[] args) {

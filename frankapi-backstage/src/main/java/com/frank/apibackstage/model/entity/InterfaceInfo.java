@@ -121,13 +121,13 @@ public class InterfaceInfo implements Serializable {
     /**
      * 创建时间
      */
-    @TableField("createTime")
+    @TableField(value = "createTime", fill = FieldFill.INSERT)
     private Date createTime;
 
     /**
      * 更新时间
      */
-    @TableField("updateTime")
+    @TableField(value = "updateTime", fill = FieldFill.INSERT_UPDATE)
     private Date updateTime;
 
     /**

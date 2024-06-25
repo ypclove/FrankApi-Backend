@@ -1,9 +1,6 @@
 package com.frank.apibackstage.model.entity;
 
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.annotation.*;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
@@ -62,7 +59,7 @@ public class ProductOrder implements Serializable {
     private String orderName;
 
     /**
-     * 金额(分)
+     * 金额（单位：分）
      */
     @TableField("total")
     private Long total;
@@ -115,12 +112,12 @@ public class ProductOrder implements Serializable {
     /**
      * 创建时间
      */
-    @TableField("createTime")
+    @TableField(value = "createTime", fill = FieldFill.INSERT)
     private Date createTime;
 
     /**
      * 更新时间
      */
-    @TableField("updateTime")
+    @TableField(value = "updateTime", fill = FieldFill.INSERT_UPDATE)
     private Date updateTime;
 }

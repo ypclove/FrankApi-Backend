@@ -4,17 +4,18 @@ package com.frank.apicommon.common;
 import lombok.Getter;
 
 /**
- * 错误码
+ * 状态码
  *
  * @author Frank
  * @data 2024/06/22
  */
 @Getter
-public enum ErrorCode {
+public enum StatusCode {
+
     /**
      * 成功
      */
-    SUCCESS(0, "ok"),
+    SUCCESS(20000, "success"),
 
     /**
      * 请求参数错误
@@ -62,12 +63,12 @@ public enum ErrorCode {
     private final int code;
 
     /**
-     * 错误信息
+     * 状态信息
      */
-    private final String message;
+    private final String msg;
 
-    ErrorCode(int code, String message) {
+    StatusCode(int code, String msg) {
         this.code = code;
-        this.message = message;
+        this.msg = msg;
     }
 }

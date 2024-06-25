@@ -17,9 +17,9 @@ public enum ProductTypeStatusEnum {
     VIP("VIP会员", "VIP"),
 
     /**
-     * 余额充值
+     * 积分充值
      */
-    RECHARGE("余额充值", "RECHARGE"),
+    RECHARGE("积分充值", "RECHARGE"),
 
     /**
      * 充值活动

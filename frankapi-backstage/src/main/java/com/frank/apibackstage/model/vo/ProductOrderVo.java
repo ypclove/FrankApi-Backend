@@ -48,7 +48,7 @@ public class ProductOrderVo implements Serializable {
     private Long productId;
 
     /**
-     * 金额（单位：分）
+     * 金额
      */
     private String total;
 

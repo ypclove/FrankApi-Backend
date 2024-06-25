@@ -1,9 +1,6 @@
 package com.frank.apibackstage.model.entity;
 
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.annotation.*;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
@@ -55,17 +52,19 @@ public class User implements Serializable {
 
     /**
      * 性别
-     * 0：男
-     * 1：女
+     * 1：男
+     * 0：女
      */
     @TableField("gender")
-    private String gender;
+    private Integer gender;
 
     /**
-     * 用户角色：user / admin
+     * 用户角色
+     * 0：管理员
+     * 1：普通用户
      */
     @TableField("userRole")
-    private String userRole;
+    private Integer userRole;
 
     /**
      * 密码
@@ -86,10 +85,10 @@ public class User implements Serializable {
     private String secretKey;
 
     /**
-     * 钱包余额，注册送 30 币
+     * 积分
      */
     @TableField("balance")
-    private Long balance;
+    private Integer balance;
 
     /**
      * 邀请码
@@ -108,18 +107,19 @@ public class User implements Serializable {
     /**
      * 创建时间
      */
-    @TableField("createTime")
+    @TableField(value = "createTime", fill = FieldFill.INSERT)
     private Date createTime;
 
     /**
      * 更新时间
      */
-    @TableField("updateTime")
+    @TableField(value = "updateTime", fill = FieldFill.INSERT_UPDATE)
     private Date updateTime;
 
     /**
      * 是否删除
      */
+    @TableLogic
     @TableField("isDelete")
     private Integer isDelete;
 }

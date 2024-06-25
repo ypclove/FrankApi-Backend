@@ -1,6 +1,6 @@
 package com.frank.apicommon.exception;
 
-import com.frank.apicommon.common.ErrorCode;
+import com.frank.apicommon.common.StatusCode;
 import lombok.Getter;
 
 /**
@@ -13,22 +13,17 @@ import lombok.Getter;
 public class BusinessException extends RuntimeException {
 
     /**
-     * 错误码
+     * 状态码
      */
     private final int code;
 
-    public BusinessException(int code, String message) {
-        super(message);
-        this.code = code;
+    public BusinessException(StatusCode code) {
+        super(code.getMsg());
+        this.code = code.getCode();
     }
 
-    public BusinessException(ErrorCode errorCode) {
-        super(errorCode.getMessage());
-        this.code = errorCode.getCode();
-    }
-
-    public BusinessException(ErrorCode errorCode, String message) {
+    public BusinessException(StatusCode code, String message) {
         super(message);
-        this.code = errorCode.getCode();
+        this.code = code.getCode();
     }
 }

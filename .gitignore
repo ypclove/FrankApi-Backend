@@ -48,6 +48,8 @@ target/
 
 # test script
 test.sh
+frankapi-backstage/src/test/java/com/frank/apibackstage
+frankapi-common/src/test/java/
 
 # local env files
 .env.local

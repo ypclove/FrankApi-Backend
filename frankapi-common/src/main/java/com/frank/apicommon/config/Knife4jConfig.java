@@ -44,9 +44,9 @@ public class Knife4jConfig {
     private ApiInfo apiInfo() {
         return new ApiInfoBuilder()
                 // 接口文档的标题
-                .title("智能BI系统")
+                .title("FrankApi接口开放平台")
                 // 接口文档的描述信息
-                .description("用户只需要导入最原始的数据集，输入想要进行分析的目标（比如帮我分析一下网站的增长趋势)，就能利用 AI 自动生成一个符合要求的图表以及分析结论。此外，还会有图表管理、异步生成等功能。")
+                .description("FrankApi接口平台是一种支持API全生命周期管理的平台，从API的设计、开发、测试、部署、监控到文档生成，提供了一系列工具和服务")
                 // 提供服务者
                 .termsOfServiceUrl("https://github.com/ypclove")
                 .contact(new Contact("Frank", "https://blog.franksteven.me/", "franklove521126@163.com"))

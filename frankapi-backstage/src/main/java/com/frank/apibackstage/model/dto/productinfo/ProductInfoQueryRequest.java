@@ -34,7 +34,7 @@ public class ProductInfoQueryRequest extends PageRequest implements Serializable
     private String description;
 
     /**
-     * 金额（单位：分）
+     * 金额
      */
     private Integer total;
 

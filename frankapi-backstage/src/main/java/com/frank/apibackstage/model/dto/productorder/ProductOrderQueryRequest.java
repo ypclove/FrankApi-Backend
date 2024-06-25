@@ -29,7 +29,7 @@ public class ProductOrderQueryRequest extends PageRequest implements Serializabl
     private String orderNo;
 
     /**
-     * 金额（单位：分）
+     * 金额
      */
     private Integer total;
 

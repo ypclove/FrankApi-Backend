@@ -13,9 +13,9 @@ spring:
     name: FrankApiBackend
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://localhost:3306/********
+    url: jdbc:mysql://localhost:3306/xxxxxxxx
     username: root
-    password: ********
+    password: xxxxxxxx
   mvc:
     path match:
       matching-strategy: ANT_PATH_MATCHER
@@ -26,14 +26,14 @@ spring:
     database: 0
     host: localhost
     port: 6379
-    # password: ********
+    # password: xxxxxxxx
     timeout: 86400
-  #  邮箱配置 todo 修改为自己的邮箱发送配置 password为邮箱授权码
+  #  邮箱配置
   mail:
-    host: smtp.qq.com
-    username: ********
-    password: ********
-    emailFrom: ********
+    host: xxxxxxxx
+    username: xxxxxxxx
+    password: xxxxxxxx
+    emailFrom: xxxxxxxx
     properties:
       mail:
         smtp:
@@ -49,24 +49,23 @@ mybatis-plus:
       logic-delete-value: 1         # 逻辑已删除值（默认为 1）
       logic-not-delete-value: 0     # 逻辑未删除值（默认为 0）
 # FrankAPI-SDK 配置
-qi:
+frank:
   api:
     client:
-      # 本地测试网关地址
-      host: ********
+      host: http://localhost:8090/api
 cos:
   client:
-    accessKey: ********
-    secretKey: ********
-    region: ********
-    bucket: ********
-    cos-host: ********
+    accessKey: xxxxxxxx
+    secretKey: xxxxxxxx
+    region: xxxxxxxx
+    bucket: xxxxxxxx
+    cos-host: xxxxxxxx
 # 微信支付配置
 wx:
   pay:
-    appId: ********
-    mchId: ********
-    apiV3Key: ********
+    appId: xxxxxxxx
+    mchId: xxxxxxxx
+    apiV3Key: xxxxxxxx
     sandbox: false # 是否沙箱环境
     privateKeyPath: classpath:/pem/apiclient_key.pem
     privateCertPath: classpath:/pem/apiclient_cert.pem
@@ -74,15 +73,15 @@ wx:
     notifyUrl: https://beloved-massive-sheepdog.ngrok-free.app/api/order/notify/order
 # 支付宝支付配置
 alipay:
-  appId: ********
-  sellerId: ********
+  appId: xxxxxxxx
+  sellerId: xxxxxxxx
   # 是否沙箱环境
   sandbox: false
   # 本地测试用 ngrok 内网穿透
   notifyUrl: https://beloved-massive-sheepdog.ngrok-free.app/api/order/notify/order
-  returnUrl: ********
-  private-key: ********
-  ali-pay-public-key: ********
+  returnUrl: http://localhost:8000/account/center
+  private-key: xxxxxxxx
+  ali-pay-public-key: xxxxxxxx
 dubbo:
   application:
     enable-file-cache: false
