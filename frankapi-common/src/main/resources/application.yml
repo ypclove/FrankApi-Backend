@@ -1,5 +1,5 @@
 server:
-  port: 7529
+  port: 7523
   address: 0.0.0.0
   servlet:
     context-path: /api
@@ -10,11 +10,11 @@ spring:
   profiles:
     active: dev
   application:
-    name: FrankApiBackend
+    name: FrankApiCommon
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
     url: jdbc:mysql://localhost:3306/xxxxxxxx
-    username: root
+    username: xxxxxxxx
     password: xxxxxxxx
   mvc:
     path match:
@@ -92,3 +92,10 @@ dubbo:
   registry:
     id: nacos-registry
     address: nacos://localhost:8848
+encrypt:
+  rsa:
+    rsa-public-key: xxxxxxxx
+    rsa-private-key: xxxxxxxx
+  aes:
+    key: xxxxxxxx
+    keyVI: xxxxxxxx

@@ -39,7 +39,4 @@ public class UserRegisterRequest implements Serializable {
 
     @Schema(description = "邀请码（可选）", requiredMode = Schema.RequiredMode.NOT_REQUIRED, example = "7TrsW6xB")
     private String invitationCode;
-
-    // TODO: 需要判断是否同意隐私协议
-    private String agreeToAnAgreement;
 }

@@ -1,7 +1,5 @@
 package com.frank.apibackstage.controller;
 
-import cn.hutool.core.util.BooleanUtil;
-import cn.hutool.core.util.RandomUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -10,7 +8,6 @@ import com.frank.apibackstage.annotation.AuthCheck;
 import com.frank.apibackstage.model.dto.user.*;
 import com.frank.apibackstage.model.entity.User;
 import com.frank.apibackstage.model.vo.UserVO;
-import com.frank.apibackstage.service.EmailService;
 import com.frank.apibackstage.service.UserService;
 import com.frank.apicommon.common.BaseResponse;
 import com.frank.apicommon.common.ResultUtils;
@@ -20,6 +17,7 @@ import com.frank.apicommon.exception.BusinessException;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.hibernate.validator.constraints.Length;
 import org.springframework.beans.BeanUtils;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.transaction.annotation.Transactional;
@@ -34,13 +32,9 @@ import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
-import static cn.hutool.core.util.RadixUtil.RADIXS_59;
 import static com.frank.apicommon.constant.RedisConstant.CAPTCHA_CACHE_KEY;
-import static com.frank.apicommon.constant.RedisConstant.CAPTCHA_CACHE_TTL;
-import static com.frank.apicommon.constant.UserConstant.CAPTCHA_LENGTH;
 
 /**
  * @author Frank
@@ -54,9 +48,6 @@ public class UserController {
 
     @Resource
     private UserService userService;
-
-    @Resource
-    private EmailService emailService;
 
     @Resource
     private RedisTemplate<String, String> redisTemplate;
@@ -115,6 +106,21 @@ public class UserController {
     }
 
     /**
+     * 获取验证码
+     *
+     * @param emailAccount 邮件帐号
+     * @return 获取验证码是否成功
+     */
+    @GetMapping("/getCaptcha")
+    public BaseResponse<Boolean> getCaptcha(@Email(message = "邮箱格式不正确")
+                                            @NotEmpty(message = "邮箱不能为空")
+                                            @Size(max = 50, message = "邮箱长度不能超过 50 个字符")
+                                            String emailAccount) {
+        Boolean result = userService.getCaptcha(emailAccount);
+        return ResultUtils.success(result);
+    }
+
+    /**
      * 用户绑定邮件
      *
      * @param userBindEmailRequest 用户绑定邮件请求
@@ -138,38 +144,12 @@ public class UserController {
     @PostMapping("/unbindEmail")
     public BaseResponse<UserVO> userUnBindEmail(@Valid @RequestBody UserUnBindEmailRequest userUnBindEmailRequest,
                                                 HttpServletRequest request) {
-        if (userUnBindEmailRequest == null) {
+        if (ObjectUtils.anyNull(userUnBindEmailRequest)) {
             throw new BusinessException(StatusCode.PARAMS_ERROR);
         }
         UserVO user = userService.userUnBindEmail(userUnBindEmailRequest, request);
         redisTemplate.delete(CAPTCHA_CACHE_KEY + userUnBindEmailRequest.getEmailAccount());
         return ResultUtils.success(user);
-    }
-
-    /**
-     * 获取验证码
-     *
-     * @param emailAccount 邮件帐号
-     * @return 获取验证码是否成功
-     */
-    @GetMapping("/getCaptcha")
-    public BaseResponse<Boolean> getCaptcha(@Email(message = "邮箱格式不正确")
-                                            @NotEmpty(message = "邮箱不能为空")
-                                            @Size(max = 50, message = "邮箱长度不能超过 50 个字符")
-                                            String emailAccount) {
-        String captcha = RandomUtil.randomString(RADIXS_59, CAPTCHA_LENGTH);
-        try {
-            boolean res = emailService.sendEmail(emailAccount, captcha);
-            if (BooleanUtil.isFalse(res)) {
-                throw new BusinessException(StatusCode.OPERATION_ERROR, "邮件发送给失败");
-            }
-            // 邮箱验证码缓存 5 分钟
-            redisTemplate.opsForValue().set(CAPTCHA_CACHE_KEY + emailAccount, captcha, CAPTCHA_CACHE_TTL, TimeUnit.MINUTES);
-            return ResultUtils.success(true);
-        } catch (Exception e) {
-            log.error("验证码获取失败：{}", e.getMessage());
-            throw new BusinessException(StatusCode.OPERATION_ERROR, "验证码获取失败");
-        }
     }
 
     /**
@@ -194,7 +174,7 @@ public class UserController {
      */
     @PostMapping("/logout")
     public BaseResponse<Boolean> userLogout(HttpServletRequest request) {
-        if (request == null) {
+        if (ObjectUtils.anyNull(request)) {
             throw new BusinessException(StatusCode.PARAMS_ERROR);
         }
         boolean result = userService.userLogout(request);
@@ -262,34 +242,13 @@ public class UserController {
     }
 
     /**
-     * 获取用户列表
-     *
-     * @param userQueryRequest 用户查询请求
-     * @return 用户列表
-     */
-    @GetMapping("/list")
-    public BaseResponse<List<UserVO>> listUser(@Valid @RequestBody UserQueryRequest userQueryRequest) {
-        User userQuery = new User();
-        BeanUtils.copyProperties(userQueryRequest, userQuery);
-
-        QueryWrapper<User> queryWrapper = new QueryWrapper<>(userQuery);
-        List<User> userList = userService.list(queryWrapper);
-        List<UserVO> userVOList = userList.stream().map(user -> {
-            UserVO userVO = new UserVO();
-            BeanUtils.copyProperties(user, userVO);
-            return userVO;
-        }).collect(Collectors.toList());
-        return ResultUtils.success(userVOList);
-    }
-
-    /**
      * 分页获取用户列表
      *
      * @param userQueryRequest 用户查询请求
      * @return 用户分页列表
      */
     @GetMapping("/list/page")
-    public BaseResponse<Page<UserVO>> listUserByPage(UserQueryRequest userQueryRequest) {
+    public BaseResponse<Page<UserVO>> getUserListByPage(UserQueryRequest userQueryRequest) {
         User userQuery = new User();
 
         if (userQueryRequest == null) {
@@ -317,46 +276,6 @@ public class UserController {
         }).collect(Collectors.toList());
         userVoPage.setRecords(userVOList);
         return ResultUtils.success(userVoPage);
-    }
-
-    /**
-     * 更新用户代金券
-     *
-     * @param request HttpServletRequest
-     * @return 更新代金券之后的用户
-     */
-    @PostMapping("/update/voucher")
-    public BaseResponse<UserVO> updateVoucher(HttpServletRequest request) {
-        if (request == null) {
-            throw new BusinessException(StatusCode.PARAMS_ERROR);
-        }
-        UserVO loginUser = userService.getLoginUser(request);
-        User user = new User();
-        BeanUtils.copyProperties(loginUser, user);
-        UserVO userVO = userService.updateVoucher(user);
-        return ResultUtils.success(userVO);
-    }
-
-    /**
-     * 通过邀请码查询用户
-     *
-     * @param invitationCode 邀请码
-     * @return 用户信息
-     */
-    @PostMapping("/get/invitationCode")
-    public BaseResponse<UserVO> getUserByInvitationCode(String invitationCode) {
-        if (StringUtils.isBlank(invitationCode)) {
-            throw new BusinessException(StatusCode.PARAMS_ERROR);
-        }
-        LambdaQueryWrapper<User> userLambdaQueryWrapper = new LambdaQueryWrapper<>();
-        userLambdaQueryWrapper.eq(User::getInvitationCode, invitationCode);
-        User invitationCodeUser = userService.getOne(userLambdaQueryWrapper);
-        if (invitationCodeUser == null) {
-            throw new BusinessException(StatusCode.NOT_FOUND_ERROR, "邀请码不存在");
-        }
-        UserVO userVO = new UserVO();
-        BeanUtils.copyProperties(invitationCodeUser, userVO);
-        return ResultUtils.success(userVO);
     }
 
     /**
@@ -391,5 +310,29 @@ public class UserController {
         }
         user.setStatus(UserAccountStatusEnum.NORMAL.getValue());
         return ResultUtils.success(userService.updateById(user));
+    }
+
+    /**
+     * 通过邀请码查询用户
+     *
+     * @param invitationCode 邀请码
+     * @return 用户信息
+     */
+    @PostMapping("/get/invitationCode")
+    public BaseResponse<UserVO> getUserByInvitationCode(@Valid @NotEmpty(message = "邀请码不能为空")
+                                                        @Length(min = 6, max = 6, message = "邀请码长度错误")
+                                                        String invitationCode) {
+        if (StringUtils.isBlank(invitationCode)) {
+            throw new BusinessException(StatusCode.PARAMS_ERROR);
+        }
+        LambdaQueryWrapper<User> userLambdaQueryWrapper = new LambdaQueryWrapper<>();
+        userLambdaQueryWrapper.eq(User::getInvitationCode, invitationCode);
+        User invitationCodeUser = userService.getOne(userLambdaQueryWrapper);
+        if (ObjectUtils.anyNull(invitationCodeUser)) {
+            throw new BusinessException(StatusCode.NOT_FOUND_ERROR, "邀请码不存在");
+        }
+        UserVO userVO = new UserVO();
+        BeanUtils.copyProperties(invitationCodeUser, userVO);
+        return ResultUtils.success(userVO);
     }
 }

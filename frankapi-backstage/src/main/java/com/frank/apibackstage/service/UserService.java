@@ -19,7 +19,7 @@ public interface UserService extends IService<User> {
      * @param userRegisterRequest 用户注册请求
      * @return 用户 Id
      */
-    long userRegister(UserRegisterRequest userRegisterRequest);
+    Long userRegister(UserRegisterRequest userRegisterRequest);
 
     /**
      * 用户通过邮件注册
@@ -49,6 +49,14 @@ public interface UserService extends IService<User> {
     UserVO userEmailLogin(UserEmailLoginRequest userEmailLoginRequest, HttpServletRequest request);
 
     /**
+     * 获取验证码
+     *
+     * @param emailAccount 邮箱账号
+     * @return 验证码
+     */
+    Boolean getCaptcha(String emailAccount);
+
+    /**
      * 用户绑定邮件
      *
      * @param userBindEmailRequest 用户绑定邮件请求
@@ -65,14 +73,6 @@ public interface UserService extends IService<User> {
      * @return 解绑邮件后的新用户信息
      */
     UserVO userUnBindEmail(UserUnBindEmailRequest userUnBindEmailRequest, HttpServletRequest request);
-
-    /**
-     * 添加积分
-     *
-     * @param userId           用户 Id
-     * @param addBalanceNumber 添加的积分数量
-     */
-    boolean addBalance(Long userId, Integer addBalanceNumber);
 
     /**
      * 获取当前登录用户
@@ -107,10 +107,10 @@ public interface UserService extends IService<User> {
     Boolean updateUser(UserUpdateRequest userUpdateRequest);
 
     /**
-     * 更新用户代金券
+     * 添加积分
      *
-     * @param user 用户
-     * @return 更新代金券之后的用户
+     * @param userId           用户 Id
+     * @param addBalanceNumber 添加的积分数量
      */
-    UserVO updateVoucher(User user);
+    boolean addBalance(Long userId, Integer addBalanceNumber);
 }

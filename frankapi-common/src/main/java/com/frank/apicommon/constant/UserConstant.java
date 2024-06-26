@@ -13,9 +13,6 @@ public class UserConstant {
      */
     public static final String USER_LOGIN_STATE = "userLoginState";
 
-
-    // region 权限
-
     /**
      * 盐值，混淆密码
      */
@@ -27,37 +24,7 @@ public class UserConstant {
     public static final String VOUCHER = "accessKey_secretKey";
 
     /**
-     * 用户昵称最大长度
-     */
-    public static final Integer USER_NAME_MAX_LENGTH = 40;
-
-    /**
-     * 用户账号最小长度
-     */
-    public static final Integer USER_ACCOUNT_MIN_LENGTH = 4;
-
-    /**
-     * 用户账号最大长度
-     */
-    public static final Integer USER_ACCOUNT_MAX_LENGTH = 16;
-
-    /**
-     * 账户特殊字符匹配模式
-     */
-    public static final String ACCOUNT_PATTERN = "^[A-Za-z0-9]+$";
-
-    /**
-     * 用户密码最小长度
-     */
-    public static final Integer USER_PASSWORD_MIN_LENGTH = 8;
-
-    /**
-     * 用户密码最大长度
-     */
-    public static final Integer USER_PASSWORD_MAX_LENGTH = 16;
-
-    /**
-     * 验证码的长度
+     * 验证码长度
      */
     public static final Integer CAPTCHA_LENGTH = 6;
 

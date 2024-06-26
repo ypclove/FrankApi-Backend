@@ -10,12 +10,14 @@ import com.frank.apibackstage.mapper.UserMapper;
 import com.frank.apibackstage.model.dto.user.*;
 import com.frank.apibackstage.model.entity.User;
 import com.frank.apibackstage.model.vo.UserVO;
+import com.frank.apibackstage.service.EmailService;
 import com.frank.apibackstage.service.UserService;
 import com.frank.apicommon.common.StatusCode;
 import com.frank.apicommon.enums.UserAccountStatusEnum;
 import com.frank.apicommon.exception.BusinessException;
 import com.frank.apicommon.utils.RedissonLockUtil;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -26,12 +28,12 @@ import org.springframework.util.DigestUtils;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import java.util.Arrays;
+import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
 
 import static cn.hutool.core.util.RadixUtil.RADIXS_59;
 import static com.frank.apicommon.constant.EmailConstant.EMAIL_PATTERN;
-import static com.frank.apicommon.constant.RedisConstant.CAPTCHA_CACHE_KEY;
-import static com.frank.apicommon.constant.RedisConstant.REGISTER_KEY;
+import static com.frank.apicommon.constant.RedisConstant.*;
 import static com.frank.apicommon.constant.UserConstant.*;
 
 /**
@@ -44,6 +46,9 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
 
     @Resource
     private UserMapper userMapper;
+
+    @Resource
+    private EmailService emailService;
 
     @Resource
     private RedissonLockUtil redissonLockUtil;
@@ -59,7 +64,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public long userRegister(UserRegisterRequest userRegisterRequest) {
+    public Long userRegister(UserRegisterRequest userRegisterRequest) {
         String userAccount = userRegisterRequest.getUserAccount();
         String userPassword = userRegisterRequest.getUserPassword();
         String invitationCode = userRegisterRequest.getInvitationCode();
@@ -103,7 +108,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
                     throw new BusinessException(StatusCode.PARAMS_ERROR, "通过邀请码注册失败");
                 }
             }
-            user.setInvitationCode(RandomUtil.randomString(RADIXS_59, INVITATION_CODE_LENGTH));
+            user.setInvitationCode(generateCaptcha(INVITATION_CODE_LENGTH));
             boolean saveResult = this.save(user);
             if (!saveResult) {
                 throw new BusinessException(StatusCode.SYSTEM_ERROR, "注册失败，数据库错误");
@@ -168,7 +173,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
                 user.setBalance(INIT_BALANCE);
                 this.addBalance(invitationCodeUser.getId(), INVITER_ADD_BALANCE);
             }
-            user.setInvitationCode(RandomUtil.randomString(RADIXS_59, INVITATION_CODE_LENGTH));
+            user.setInvitationCode(generateCaptcha(INVITATION_CODE_LENGTH));
             boolean saveResult = this.save(user);
             if (!saveResult) {
                 throw new BusinessException(StatusCode.SYSTEM_ERROR, "注册失败，数据库错误");
@@ -246,6 +251,29 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         // 记录用户的登录态
         request.getSession().setAttribute(USER_LOGIN_STATE, userVO);
         return userVO;
+    }
+
+    /**
+     * 获取验证码
+     *
+     * @param emailAccount 邮箱账号
+     * @return 验证码
+     */
+    @Override
+    public Boolean getCaptcha(String emailAccount) {
+        String captcha = generateCaptcha(CAPTCHA_LENGTH);
+        try {
+            boolean res = emailService.sendEmail(emailAccount, captcha);
+            if (BooleanUtil.isFalse(res)) {
+                throw new BusinessException(StatusCode.OPERATION_ERROR, "邮件发送给失败");
+            }
+            // 邮箱验证码缓存 5 分钟
+            redisTemplate.opsForValue().set(CAPTCHA_CACHE_KEY + emailAccount, captcha, CAPTCHA_CACHE_TTL, TimeUnit.MINUTES);
+            return true;
+        } catch (Exception e) {
+            log.error("验证码获取失败：{}", e.getMessage());
+            throw new BusinessException(StatusCode.OPERATION_ERROR, "验证码获取失败");
+        }
     }
 
     /**
@@ -370,7 +398,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
      */
     @Override
     public boolean userLogout(HttpServletRequest request) {
-        if (request.getSession().getAttribute(USER_LOGIN_STATE) == null) {
+        if (ObjectUtils.anyNull(request.getSession().getAttribute(USER_LOGIN_STATE))) {
             throw new BusinessException(StatusCode.OPERATION_ERROR, "未登录");
         }
         // 移除登录态
@@ -394,7 +422,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         if (count > 0) {
             throw new BusinessException(StatusCode.PARAMS_ERROR, "账号重复");
         }
-        user.setInvitationCode(RandomUtil.randomString(RADIXS_59, INVITATION_CODE_LENGTH));
+        user.setInvitationCode(generateCaptcha(INVITATION_CODE_LENGTH));
         String encryptPassword = DigestUtils.md5DigestAsHex((SALT + user.getUserPassword()).getBytes());
         user.setUserPassword(encryptPassword);
         boolean saveResult = this.save(user);
@@ -424,27 +452,6 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     }
 
     /**
-     * 更新用户代金券
-     *
-     * @param user 用户
-     * @return 更新代金券之后的用户
-     */
-    @Override
-    public UserVO updateVoucher(User user) {
-        String accessKey = DigestUtils.md5DigestAsHex((Arrays.toString(RandomUtil.randomBytes(ACCESS_KEY_RANDOM_BYTES_LENGTH)) + SALT + VOUCHER).getBytes());
-        String secretKey = DigestUtils.md5DigestAsHex((SALT + VOUCHER + Arrays.toString(RandomUtil.randomBytes(SECRET_KEY_RANDOM_BYTES_LENGTH))).getBytes());
-        user.setAccessKey(accessKey);
-        user.setSecretKey(secretKey);
-        boolean result = this.updateById(user);
-        if (!result) {
-            throw new BusinessException(StatusCode.OPERATION_ERROR);
-        }
-        UserVO userVO = new UserVO();
-        BeanUtils.copyProperties(user, userVO);
-        return userVO;
-    }
-
-    /**
      * 用户通过邀请码注册成功时，增加邀请人的积分
      *
      * @param userId           用户 Id
@@ -456,5 +463,15 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         userLambdaUpdateWrapper.eq(User::getId, userId);
         userLambdaUpdateWrapper.setSql("balance = balance + " + addBalanceNumber);
         return this.update(userLambdaUpdateWrapper);
+    }
+
+    /**
+     * 生成校验码（验证码 / 邀请码）
+     *
+     * @param length 长度
+     * @return 校验码
+     */
+    private String generateCaptcha(Integer length) {
+        return RandomUtil.randomString(RADIXS_59, length);
     }
 }
