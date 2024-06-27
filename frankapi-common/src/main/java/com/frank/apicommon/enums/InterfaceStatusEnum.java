@@ -12,26 +12,26 @@ import lombok.Getter;
 public enum InterfaceStatusEnum {
 
     /**
-     * 开启
-     */
-    ONLINE("开启", 1),
-
-    /**
      * 关闭
      */
-    OFFLINE("关闭", 2),
+    OFFLINE(0, "关闭"),
+
+    /**
+     * 开启
+     */
+    ONLINE(1, "开启"),
 
     /**
      * 审核中
      */
-    AUDITING("审核中", 0);
+    AUDITING(2, "审核中");
+
+    private final int code;
 
     private final String text;
 
-    private final int value;
-
-    InterfaceStatusEnum(String text, int value) {
+    InterfaceStatusEnum(int code, String text) {
+        this.code = code;
         this.text = text;
-        this.value = value;
     }
 }

@@ -1,8 +1,6 @@
 package com.frank.apibackstage.inner;
 
 
-import com.frank.apibackstage.model.entity.InterfaceInfo;
-
 /**
  * 接口信息服务
  *
@@ -18,5 +16,5 @@ public interface InnerInterfaceInfoService {
      * @param method 方法
      * @return 接口信息
      */
-    InterfaceInfo getInterfaceInfo(String path, String method);
+    // InterfaceInfo getInterfaceInfo(String path, Integer method);
 }

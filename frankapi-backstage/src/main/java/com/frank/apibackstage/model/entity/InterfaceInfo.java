@@ -8,10 +8,8 @@ import java.io.Serializable;
 import java.util.Date;
 
 /**
- * 接口信息表
- *
  * @author Frank
- * @data 2024/06/22
+ * @since 2024/06/26
  */
 @Data
 @Accessors(chain = true)
@@ -23,7 +21,7 @@ public class InterfaceInfo implements Serializable {
     /**
      * id
      */
-    @TableId(value = "id", type = IdType.ASSIGN_ID)
+    @TableId(value = "id", type = IdType.AUTO)
     private Long id;
 
     /**
@@ -39,7 +37,7 @@ public class InterfaceInfo implements Serializable {
     private String url;
 
     /**
-     * 发布人
+     * 发布人 Id
      */
     @TableField("userId")
     private Long userId;
@@ -48,7 +46,7 @@ public class InterfaceInfo implements Serializable {
      * 请求方法
      */
     @TableField("method")
-    private String method;
+    private Integer method;
 
     /**
      * 接口请求参数
@@ -63,10 +61,10 @@ public class InterfaceInfo implements Serializable {
     private String responseParams;
 
     /**
-     * 扣除积分数
+     * 扣除积分数个数
      */
     @TableField("reduceScore")
-    private Long reduceScore;
+    private Integer reduceScore;
 
     /**
      * 请求示例
@@ -87,7 +85,7 @@ public class InterfaceInfo implements Serializable {
     private String responseHeader;
 
     /**
-     * 返回格式(JSON等等)
+     * 返回格式
      */
     @TableField("returnFormat")
     private String returnFormat;
@@ -100,8 +98,9 @@ public class InterfaceInfo implements Serializable {
 
     /**
      * 接口状态
-     * 0：默认下线
-     * 1：上线
+     * 0：关闭
+     * 1：开启
+     * 2：审核中
      */
     @TableField("status")
     private Integer status;
@@ -110,13 +109,7 @@ public class InterfaceInfo implements Serializable {
      * 接口总调用次数
      */
     @TableField("totalInvokes")
-    private Long totalInvokes;
-
-    /**
-     * 接口头像
-     */
-    @TableField("avatarUrl")
-    private String avatarUrl;
+    private Integer totalInvokes;
 
     /**
      * 创建时间
@@ -131,9 +124,11 @@ public class InterfaceInfo implements Serializable {
     private Date updateTime;
 
     /**
-     * 是否删除
+     * 逻辑删除
+     * 0：未删除
+     * 1：已删除
      */
     @TableLogic
     @TableField("isDelete")
-    private Integer isDelete;
+    private Boolean isDelete;
 }

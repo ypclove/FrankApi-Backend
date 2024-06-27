@@ -6,7 +6,7 @@ import org.apache.ibatis.annotations.Mapper;
 
 /**
  * @author Frank
- * @data 2024/06/22
+ * @since 2024/06/26
  */
 @Mapper
 public interface InterfaceInfoMapper extends BaseMapper<InterfaceInfo> {

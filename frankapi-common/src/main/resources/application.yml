@@ -24,8 +24,8 @@ spring:
     store-type: redis
   redis:
     database: 0
-    host: localhost
-    port: 6379
+    host: xxxxxxxx
+    port: xxxxxxxx
     # password: xxxxxxxx
     timeout: 86400
   #  邮箱配置

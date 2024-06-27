@@ -27,10 +27,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
-import javax.validation.constraints.Email;
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
+import javax.validation.constraints.*;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -202,7 +199,10 @@ public class UserController {
      */
     @DeleteMapping("/delete/{userId}")
     @AuthCheck(mustRole = 0)
-    public BaseResponse<Boolean> deleteUser(@PathVariable @NotNull(message = "用户 Id 不能为空") Long userId) {
+    public BaseResponse<Boolean> deleteUser(@PathVariable @Valid
+                                            @NotNull(message = "用户 Id 不能为空")
+                                            @Min(value = 1L, message = "用户 Id 错误")
+                                            Long userId) {
         boolean result = userService.removeById(userId);
         if (!result) {
             throw new BusinessException(StatusCode.OPERATION_ERROR, "删除用户失败");
@@ -231,7 +231,10 @@ public class UserController {
      * @return 用户信息
      */
     @GetMapping("/get/{userId}")
-    public BaseResponse<UserVO> getUserById(@PathVariable @NotNull(message = "用户 Id 不能为空") Long userId) {
+    public BaseResponse<UserVO> getUserById(@PathVariable @Valid
+                                            @NotNull(message = "用户 Id 不能为空")
+                                            @Min(value = 1L, message = "用户 Id 错误")
+                                            Long userId) {
         User user = userService.getById(userId);
         if (ObjectUtils.anyNull(user)) {
             throw new BusinessException(StatusCode.OPERATION_ERROR, "查询用户失败");
@@ -286,7 +289,10 @@ public class UserController {
      */
     @PostMapping("/ban/{userId}")
     @AuthCheck(mustRole = 0)
-    public BaseResponse<Boolean> banUser(@PathVariable @NotNull(message = "用户 Id 不能为空") Long userId) {
+    public BaseResponse<Boolean> banUser(@PathVariable @Valid
+                                         @NotNull(message = "用户 Id 不能为空")
+                                         @Min(value = 1L, message = "用户 Id 错误")
+                                         Long userId) {
         User user = userService.getById(userId);
         if (ObjectUtils.anyNull(user)) {
             throw new BusinessException(StatusCode.NOT_FOUND_ERROR);
@@ -303,7 +309,10 @@ public class UserController {
      */
     @AuthCheck(mustRole = 0)
     @PostMapping("/normal/{userId}")
-    public BaseResponse<Boolean> normalUser(@PathVariable @NotNull(message = "用户 Id 不能为空") Long userId) {
+    public BaseResponse<Boolean> normalUser(@PathVariable @Valid
+                                            @NotNull(message = "用户 Id 不能为空")
+                                            @Min(value = 1L, message = "用户 Id 错误")
+                                            Long userId) {
         User user = userService.getById(userId);
         if (ObjectUtils.anyNull(user)) {
             throw new BusinessException(StatusCode.NOT_FOUND_ERROR);
@@ -320,7 +329,7 @@ public class UserController {
      */
     @PostMapping("/get/invitationCode")
     public BaseResponse<UserVO> getUserByInvitationCode(@Valid @NotEmpty(message = "邀请码不能为空")
-                                                        @Length(min = 6, max = 6, message = "邀请码长度错误")
+                                                        @Length(min = 6, max = 6, message = "邀请码不存在")
                                                         String invitationCode) {
         if (StringUtils.isBlank(invitationCode)) {
             throw new BusinessException(StatusCode.PARAMS_ERROR);

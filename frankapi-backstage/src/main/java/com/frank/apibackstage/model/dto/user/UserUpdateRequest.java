@@ -24,6 +24,7 @@ public class UserUpdateRequest implements Serializable {
 
     @Schema(description = "用户 Id", requiredMode = Schema.RequiredMode.REQUIRED, example = "1L")
     @NotNull(message = "用户 Id 不能为空")
+    @Min(value = 1L, message = "用户 Id 错误")
     private Long id;
 
     @Schema(description = "用户账号", requiredMode = Schema.RequiredMode.REQUIRED, example = "frank")

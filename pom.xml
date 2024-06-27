@@ -30,7 +30,9 @@
         <spring-boot-dependencies.version>2.7.2</spring-boot-dependencies.version>
 
         <!--DB相关-->
-        <mybatis-plus-boot-starter.version>3.5.2</mybatis-plus-boot-starter.version>
+        <mybatis-plus.version>3.5.2</mybatis-plus.version>
+        <velocity.version>2.0</velocity.version>
+        <freemarker.version>2.3.23</freemarker.version>
         <redisson.version>3.17.5</redisson.version>
 
         <!--工具类相关-->
@@ -71,8 +73,23 @@
             <dependency>
                 <groupId>com.baomidou</groupId>
                 <artifactId>mybatis-plus-boot-starter</artifactId>
-                <version>${mybatis-plus-boot-starter.version}</version>
+                <version>${mybatis-plus.version}</version>
             </dependency>
+            <dependency>
+                <groupId>com.baomidou</groupId>
+                <artifactId>mybatis-plus-generator</artifactId>
+                <version>${mybatis-plus.version}</version>
+            </dependency>
+            <!--            <dependency>-->
+            <!--                <groupId>org.apache.velocity</groupId>-->
+            <!--                <artifactId>velocity-engine-core</artifactId>-->
+            <!--                <version>${velocity.version}</version>-->
+            <!--            </dependency>-->
+            <!--            <dependency>-->
+            <!--                <groupId>org.freemarker</groupId>-->
+            <!--                <artifactId>freemarker</artifactId>-->
+            <!--                <version>${freemarker.version}</version>-->
+            <!--            </dependency>-->
             <dependency>
                 <groupId>org.redisson</groupId>
                 <artifactId>redisson</artifactId>

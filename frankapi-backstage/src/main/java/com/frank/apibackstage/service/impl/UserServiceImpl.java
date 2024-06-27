@@ -14,6 +14,7 @@ import com.frank.apibackstage.service.EmailService;
 import com.frank.apibackstage.service.UserService;
 import com.frank.apicommon.common.StatusCode;
 import com.frank.apicommon.enums.UserAccountStatusEnum;
+import com.frank.apicommon.enums.UserRoleEnum;
 import com.frank.apicommon.exception.BusinessException;
 import com.frank.apicommon.utils.RedissonLockUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -28,6 +29,7 @@ import org.springframework.util.DigestUtils;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import java.util.Arrays;
+import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
 
@@ -463,6 +465,43 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         userLambdaUpdateWrapper.eq(User::getId, userId);
         userLambdaUpdateWrapper.setSql("balance = balance + " + addBalanceNumber);
         return this.update(userLambdaUpdateWrapper);
+    }
+
+    /**
+     * 是否为管理员
+     *
+     * @param request HttpServletRequest
+     * @return 是否为管理员
+     */
+    @Override
+    public boolean isAdmin(HttpServletRequest request) {
+        Object userObj = request.getSession().getAttribute(USER_LOGIN_STATE);
+        UserVO currentUser = (UserVO) userObj;
+        if (Objects.isNull(currentUser) || Objects.isNull(currentUser.getId())) {
+            throw new BusinessException(StatusCode.NOT_LOGIN_ERROR);
+        }
+        // 从数据库查询，TODO：追求性能的话可以注释，直接走缓存
+        long userId = currentUser.getId();
+        User user = this.getById(userId);
+        return Objects.nonNull(user) && user.getUserRole().equals(UserRoleEnum.ADMIN.getCode());
+    }
+
+    /**
+     * 是否为游客
+     *
+     * @param request HttpServletRequest
+     * @return 游客信息
+     */
+    @Override
+    public User isTourist(HttpServletRequest request) {
+        Object userObj = request.getSession().getAttribute(USER_LOGIN_STATE);
+        UserVO currentUser = (UserVO) userObj;
+        if (Objects.isNull(currentUser) || Objects.isNull(currentUser.getId())) {
+            return null;
+        }
+        // 从数据库查询，TODO：追求性能的话可以注释，直接走缓存
+        long userId = currentUser.getId();
+        return this.getById(userId);
     }
 
     /**

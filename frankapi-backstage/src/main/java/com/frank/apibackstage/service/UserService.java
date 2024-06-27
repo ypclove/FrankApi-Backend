@@ -113,4 +113,20 @@ public interface UserService extends IService<User> {
      * @param addBalanceNumber 添加的积分数量
      */
     boolean addBalance(Long userId, Integer addBalanceNumber);
+
+    /**
+     * 是否为管理员
+     *
+     * @param request HttpServletRequest
+     * @return 是否为管理员
+     */
+    boolean isAdmin(HttpServletRequest request);
+
+    /**
+     * 是否为游客
+     *
+     * @param request HttpServletRequest
+     * @return 游客信息
+     */
+    User isTourist(HttpServletRequest request);
 }

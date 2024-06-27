@@ -1,11 +1,8 @@
 package com.frank.apicommon.utils;
 
-import com.frank.apicommon.config.EmailConfig;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.ClassPathResource;
-import org.springframework.mail.javamail.JavaMailSender;
 
-import javax.annotation.Resource;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -22,12 +19,6 @@ import static com.frank.apicommon.constant.EmailConstant.*;
  */
 @Slf4j
 public class EmailUtil {
-
-    @Resource
-    private EmailConfig emailConfig;
-
-    @Resource
-    private JavaMailSender mailSender;
 
     /**
      * 生成普通电子邮件内容
