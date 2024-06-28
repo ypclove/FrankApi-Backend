@@ -29,6 +29,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import javax.validation.constraints.*;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import static com.frank.apicommon.constant.RedisConstant.CAPTCHA_CACHE_KEY;
@@ -236,7 +237,7 @@ public class UserController {
                                             @Min(value = 1L, message = "用户 Id 错误")
                                             Long userId) {
         User user = userService.getById(userId);
-        if (ObjectUtils.anyNull(user)) {
+        if (Objects.isNull(user)) {
             throw new BusinessException(StatusCode.OPERATION_ERROR, "查询用户失败");
         }
         UserVO userVO = new UserVO();
@@ -294,7 +295,7 @@ public class UserController {
                                          @Min(value = 1L, message = "用户 Id 错误")
                                          Long userId) {
         User user = userService.getById(userId);
-        if (ObjectUtils.anyNull(user)) {
+        if (Objects.isNull(user)) {
             throw new BusinessException(StatusCode.NOT_FOUND_ERROR);
         }
         user.setStatus(UserAccountStatusEnum.BAN.getValue());
@@ -314,7 +315,7 @@ public class UserController {
                                             @Min(value = 1L, message = "用户 Id 错误")
                                             Long userId) {
         User user = userService.getById(userId);
-        if (ObjectUtils.anyNull(user)) {
+        if (Objects.isNull(user)) {
             throw new BusinessException(StatusCode.NOT_FOUND_ERROR);
         }
         user.setStatus(UserAccountStatusEnum.NORMAL.getValue());

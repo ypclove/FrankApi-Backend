@@ -8,6 +8,7 @@ import lombok.Getter;
  */
 @Getter
 public enum RequestMethodEnum {
+
     GET(1, "GET"),
     POST(2, "POST"),
     PUT(3, "PUT"),

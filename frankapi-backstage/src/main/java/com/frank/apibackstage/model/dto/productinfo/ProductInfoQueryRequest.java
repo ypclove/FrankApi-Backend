@@ -36,13 +36,13 @@ public class ProductInfoQueryRequest extends PageRequest implements Serializable
     /**
      * 金额
      */
-    private Integer total;
+    private Long total;
 
     /**
      * 产品类型
      * VIP：会员
      * RECHARGE：充值
      */
-    private String productType;
+    private Integer productType;
 
 }

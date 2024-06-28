@@ -116,6 +116,9 @@ public class InterfaceInfoController {
                                                         @Min(value = 1L, message = "接口 Id 错误")
                                                         Long interfaceId) {
         InterfaceInfo interfaceInfo = interfaceInfoService.getById(interfaceId);
+        if (Objects.isNull(interfaceInfo)) {
+            throw new BusinessException(StatusCode.NOT_FOUND_ERROR);
+        }
         return ResultUtils.success(interfaceInfo);
     }
 
@@ -249,7 +252,7 @@ public class InterfaceInfoController {
                                                   @Min(value = 1L, message = "接口 Id 错误")
                                                   Long interfaceId) {
         InterfaceInfo interfaceInfo = interfaceInfoService.getById(interfaceId);
-        if (interfaceInfo == null) {
+        if (Objects.isNull(interfaceInfo)) {
             throw new BusinessException(StatusCode.NOT_FOUND_ERROR);
         }
         interfaceInfo.setStatus(InterfaceStatusEnum.OFFLINE.getCode());

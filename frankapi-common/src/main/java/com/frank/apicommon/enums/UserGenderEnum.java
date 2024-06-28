@@ -10,6 +10,7 @@ import lombok.Getter;
  */
 @Getter
 public enum UserGenderEnum {
+
     MALE(1, "男"),
     FEMALE(0, "女");
 

@@ -10,6 +10,7 @@ import lombok.Getter;
  */
 @Getter
 public enum UserRoleEnum {
+
     ADMIN(0, "管理员"),
     USER(1, "普通用户");
 

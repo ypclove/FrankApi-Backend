@@ -8,10 +8,8 @@ import java.io.Serializable;
 import java.util.Date;
 
 /**
- * 产品信息
- *
  * @author Frank
- * @data 2024/06/22
+ * @since 2024/06/27
  */
 @Data
 @Accessors(chain = true)
@@ -23,7 +21,7 @@ public class ProductInfo implements Serializable {
     /**
      * id
      */
-    @TableId(value = "id", type = IdType.ASSIGN_ID)
+    @TableId(value = "id", type = IdType.AUTO)
     private Long id;
 
     /**
@@ -45,7 +43,7 @@ public class ProductInfo implements Serializable {
     private Long userId;
 
     /**
-     * 金额(分)
+     * 产品金额（单位：分）
      */
     @TableField("total")
     private Long total;
@@ -54,21 +52,21 @@ public class ProductInfo implements Serializable {
      * 增加积分个数
      */
     @TableField("addPoints")
-    private Long addPoints;
+    private Integer addPoints;
 
     /**
      * 产品类型
-     * VIP：会员
-     * RECHARGE：充值
-     * RECHARGEACTIVITY：充值活动
+     * 1：VIP会员；
+     * 2：RECHARGE充值；
+     * 3：RECHARGEACTIVITY充值活动
      */
     @TableField("productType")
-    private String productType;
+    private Integer productType;
 
     /**
-     * 商品状态
-     * 0：默认下线
-     * 1：上线
+     * 产品状态
+     * 0：下架；
+     * 1：上架
      */
     @TableField("status")
     private Integer status;
@@ -92,7 +90,9 @@ public class ProductInfo implements Serializable {
     private Date updateTime;
 
     /**
-     * 是否删除
+     * 逻辑删除
+     * 0：未删除；
+     * 1：已删除
      */
     @TableLogic
     @TableField("isDelete")
