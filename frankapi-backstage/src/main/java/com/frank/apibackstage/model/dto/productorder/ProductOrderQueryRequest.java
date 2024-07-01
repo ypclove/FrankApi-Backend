@@ -7,7 +7,7 @@ import lombok.EqualsAndHashCode;
 import java.io.Serializable;
 
 /**
- * 产品查询请求
+ * 产品订单查询请求
  *
  * @author Frank
  * @date 2024/6/22
@@ -24,7 +24,7 @@ public class ProductOrderQueryRequest extends PageRequest implements Serializabl
     private String orderName;
 
     /**
-     * 微信订单Id / 支付宝订单Id
+     * 微信订单 Id / 支付宝订单 Id
      */
     private String orderNo;
 
@@ -35,22 +35,22 @@ public class ProductOrderQueryRequest extends PageRequest implements Serializabl
 
     /**
      * 接口订单状态
-     * SUCCESS：支付成功
-     * REFUND：转入退款
-     * NOTPAY：未支付
-     * CLOSED：已关闭
-     * REVOKED：已撤销（仅付款码支付会返回）
-     * USERPAYING：用户支付中（仅付款码支付会返回）
-     * PAYERROR：支付失败（仅付款码支付会返回）
+     * 1：SUCCESS：支付成功
+     * 2：REFUND：转入退款
+     * 3：NOTPAY：未支付
+     * 4：CLOSED：已关闭
+     * 5：REVOKED：已撤销（仅付款码支付会返回）
+     * 6：USERPAYING：用户支付中（仅付款码支付会返回）
+     * 7：PAYERROR：支付失败（仅付款码支付会返回）
      */
-    private String status;
+    private Integer status;
 
     /**
      * 支付方式
-     * WX：微信（默认）
-     * ZFB：支付宝
+     * 1：WX
+     * 2：ZFB
      */
-    private String payType;
+    private Integer payType;
 
     /**
      * 商品信息

@@ -62,7 +62,7 @@ public class ProductOrder implements Serializable {
      * 金额（单位：分）
      */
     @TableField("total")
-    private Long total;
+    private Integer total;
 
     /**
      * 交易状态
@@ -75,7 +75,7 @@ public class ProductOrder implements Serializable {
      * PAYERROR：支付失败（仅付款码支付会返回）)
      */
     @TableField("status")
-    private String status;
+    private Integer status;
 
     /**
      * 支付方式
@@ -83,7 +83,7 @@ public class ProductOrder implements Serializable {
      * ZFB：支付宝
      */
     @TableField("payType")
-    private String payType;
+    private Integer payType;
 
     /**
      * 商品信息
@@ -101,7 +101,7 @@ public class ProductOrder implements Serializable {
      * 增加积分个数
      */
     @TableField("addPoints")
-    private Long addPoints;
+    private Integer addPoints;
 
     /**
      * 过期时间

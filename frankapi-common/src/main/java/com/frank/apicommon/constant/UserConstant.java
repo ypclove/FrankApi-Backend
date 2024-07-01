@@ -21,7 +21,7 @@ public class UserConstant {
     /**
      * accessKey / secretKey 混淆
      */
-    public static final String VOUCHER = "accessKey_secretKey";
+    public static final String DEV_CRED = "accessKey_secretKey";
 
     /**
      * 验证码长度
@@ -44,12 +44,17 @@ public class UserConstant {
     public static final Integer INVITATION_CODE_LENGTH = 8;
 
     /**
-     * accessKey 随机 Byte 长度
+     * 邀请码校验规则
      */
-    public static final Integer ACCESS_KEY_RANDOM_BYTES_LENGTH = 10;
+    public static final String INVITATION_CODE_PATTERN = "^[A-Za-z0-9]{8}$";
 
     /**
-     * secretKey 随机 Byte 长度
+     * 开发者凭证随机 Byte 长度
      */
-    public static final Integer SECRET_KEY_RANDOM_BYTES_LENGTH = 10;
+    public static final Integer DEV_CRED_KEY_RANDOM_BYTES_LENGTH = 10;
+
+    /**
+     * 用户签到 Key
+     */
+    public static final String USER_DAILY_CHECK_IN = "doDailyCheckIn_";
 }

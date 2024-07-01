@@ -1,5 +1,6 @@
 package com.frank.apibackstage.model.vo;
 
+import com.frank.apibackstage.model.entity.ProductInfo;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -63,10 +64,10 @@ public class ProductOrderVo implements Serializable {
      */
     private String status;
 
-    // /**
-    //  * 产品信息
-    //  */
-    // private ProductInfo productInfo;
+    /**
+     * 产品信息
+     */
+    private ProductInfo productInfo;
 
     /**
      * 增加积分个数

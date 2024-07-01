@@ -9,8 +9,8 @@ import java.lang.annotation.*;
  * @author Frank
  * @date 2024/6/25
  */
-@Target({ElementType.TYPE, ElementType.METHOD})
-@Retention(RetentionPolicy.RUNTIME)
 @Documented
+@Retention(RetentionPolicy.RUNTIME)
+@Target({ElementType.TYPE, ElementType.METHOD})
 public @interface RequestRSA {
 }

@@ -130,5 +130,5 @@ public class InterfaceInfo implements Serializable {
      */
     @TableLogic
     @TableField("isDelete")
-    private Boolean isDelete;
+    private Integer isDelete;
 }

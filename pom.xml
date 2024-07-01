@@ -46,6 +46,7 @@
         <hutool-all.version>5.8.16</hutool-all.version>
         <dubbo.version>3.0.9</dubbo.version>
         <nacos-client.version>2.1.0</nacos-client.version>
+        <mapstruct.version>1.5.5.Final</mapstruct.version>
 
         <!--移动支付-->
         <weixin-java-pay.version>4.5.0</weixin-java-pay.version>
@@ -147,6 +148,16 @@
                 <groupId>com.alibaba.nacos</groupId>
                 <artifactId>nacos-client</artifactId>
                 <version>${nacos-client.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.mapstruct</groupId>
+                <artifactId>mapstruct</artifactId>
+                <version>${mapstruct.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.mapstruct</groupId>
+                <artifactId>mapstruct-processor</artifactId>
+                <version>${mapstruct.version}</version>
             </dependency>
 
             <!--移动支付-->

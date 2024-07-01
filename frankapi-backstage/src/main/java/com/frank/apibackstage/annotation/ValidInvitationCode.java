@@ -1,6 +1,6 @@
 package com.frank.apibackstage.annotation;
 
-import com.frank.apibackstage.validator.PasswordMatchesValidator;
+import com.frank.apibackstage.validator.InvitationCodeValidator;
 
 import javax.validation.Constraint;
 import javax.validation.Payload;
@@ -10,17 +10,15 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * 密码校验器
- *
  * @author Frank
- * @date 2024/6/24
+ * @date 2024/6/30
  */
-@Target(ElementType.TYPE)
+@Target({ElementType.FIELD})
 @Retention(RetentionPolicy.RUNTIME)
-@Constraint(validatedBy = PasswordMatchesValidator.class)
-public @interface PasswordMatches {
+@Constraint(validatedBy = InvitationCodeValidator.class)
+public @interface ValidInvitationCode {
 
-    String message() default "密码和确认密码不匹配";
+    String message() default "邀请码无效";
 
     Class<?>[] groups() default {};
 

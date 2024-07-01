@@ -79,7 +79,7 @@ alipay:
   sandbox: false
   # 本地测试用 ngrok 内网穿透
   notifyUrl: https://beloved-massive-sheepdog.ngrok-free.app/api/order/notify/order
-  returnUrl: http://localhost:8000/account/center
+  returnUrl: xxxxxxxx
   private-key: xxxxxxxx
   ali-pay-public-key: xxxxxxxx
 dubbo:

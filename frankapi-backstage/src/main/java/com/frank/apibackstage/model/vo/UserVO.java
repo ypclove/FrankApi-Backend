@@ -6,10 +6,8 @@ import java.io.Serializable;
 import java.util.Date;
 
 /**
- * 用户信息（脱敏）
- *
  * @author Frank
- * @date 2024/6/22
+ * @date 2024/6/30
  */
 @Data
 public class UserVO implements Serializable {
@@ -22,14 +20,24 @@ public class UserVO implements Serializable {
     private Long id;
 
     /**
-     * 用户昵称
+     * 账号
      */
-    private String userName;
+    private String userAccount;
 
     /**
-     * 用户昵称
+     * 用户头像
+     */
+    private String userAvatar;
+
+    /**
+     * 用户邮箱
      */
     private String email;
+
+    /**
+     * 积分
+     */
+    private Integer balance;
 
     /**
      * 邀请码
@@ -44,29 +52,11 @@ public class UserVO implements Serializable {
     private Integer status;
 
     /**
-     * 积分
+     * 用户角色
+     * 0：管理员
+     * 1：普通用户
      */
-    private Integer balance;
-
-    /**
-     * 账号
-     */
-    private String userAccount;
-
-    /**
-     * 用户头像
-     */
-    private String userAvatar;
-
-    /**
-     * 访问密钥
-     */
-    private String accessKey;
-
-    /**
-     * 秘密密钥
-     */
-    private String secretKey;
+    private Integer userRole;
 
     /**
      * 性别
@@ -74,9 +64,14 @@ public class UserVO implements Serializable {
     private Integer gender;
 
     /**
-     * 用户角色: user / admin
+     * accessKey
      */
-    private Integer userRole;
+    private String accessKey;
+
+    /**
+     * secretKey
+     */
+    private String secretKey;
 
     /**
      * 创建时间

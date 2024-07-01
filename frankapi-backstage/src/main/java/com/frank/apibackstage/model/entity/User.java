@@ -27,12 +27,6 @@ public class User implements Serializable {
     private Long id;
 
     /**
-     * 用户昵称
-     */
-    @TableField("userName")
-    private String userName;
-
-    /**
      * 账号
      */
     @TableField("userAccount")

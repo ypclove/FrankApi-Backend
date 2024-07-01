@@ -27,8 +27,8 @@ public class RedissonLockUtil {
     /**
      * redisson 分布式锁
      *
-     * @param lockName 锁名称
-     * @param supplier 供应商
+     * @param lockName 要获取的锁的名称，使用不同的锁名可以控制对不同资源的并发访问
+     * @param supplier Supplier<T> 类型的函数接口，提供具体的操作逻辑，这个操作逻辑会在获取锁之后执行
      * @param code     状态码
      * @param msg      提示消息
      * @param <T>      数据类型
@@ -37,13 +37,17 @@ public class RedissonLockUtil {
     public <T> T redissonDistributedLocks(String lockName, Supplier<T> supplier, StatusCode code, String msg) {
         RLock rLock = redissonClient.getLock(lockName);
         try {
+            // 等待时间为 0，表示不等待。如果锁不可用，立即返回 false
+            // 锁的持有时间为 -1，表示无限期持有锁，直到显式解锁
             if (rLock.tryLock(0, -1, TimeUnit.MILLISECONDS)) {
                 return supplier.get();
             }
-            throw new BusinessException(StatusCode.PARAMS_ERROR, msg);
+            throw new BusinessException(code, msg);
         } catch (Exception e) {
-            throw new BusinessException(StatusCode.OPERATION_ERROR, e.getMessage());
+            throw new BusinessException(code, e.getMessage());
         } finally {
+            // 检查当前线程是否持有锁
+            // 如果是，则释放锁，并记录日志
             if (rLock.isHeldByCurrentThread()) {
                 log.error("unLock: {}", Thread.currentThread().getId());
                 rLock.unlock();
@@ -212,8 +216,8 @@ public class RedissonLockUtil {
     /**
      * redisson 分布式锁
      *
-     * @param lockName 锁名称
-     * @param supplier 供应商
+     * @param lockName 要获取的锁的名称，使用不同的锁名可以控制对不同资源的并发访问
+     * @param supplier Supplier<T> 类型的函数接口，提供具体的操作逻辑。这个操作逻辑会在获取锁之后执行
      * @param <T>      数据类型
      * @return redisson 分布式锁
      */
@@ -259,10 +263,10 @@ public class RedissonLockUtil {
             if (rLock.tryLock(0, -1, TimeUnit.MILLISECONDS)) {
                 runnable.run();
             } else {
-                throw new BusinessException(StatusCode.PARAMS_ERROR, msg);
+                throw new BusinessException(code, msg);
             }
         } catch (Exception e) {
-            throw new BusinessException(StatusCode.OPERATION_ERROR, e.getMessage());
+            throw new BusinessException(code, e.getMessage());
         } finally {
             if (rLock.isHeldByCurrentThread()) {
                 log.info("lockName: {}, unLockId: {}", lockName, Thread.currentThread().getId());

@@ -5,7 +5,7 @@ import lombok.Getter;
 import static com.frank.apicommon.enums.PaymentStatusEnum.*;
 
 /**
- * 支付宝交易状态枚举
+ * 支付宝交易状态枚举类
  *
  * @author Frank
  * @date 2024/6/22
@@ -43,5 +43,20 @@ public enum AlipayTradeStatusEnum {
 
     AlipayTradeStatusEnum(PaymentStatusEnum orderStatusEnum) {
         this.paymentStatusEnum = orderStatusEnum;
+    }
+
+    /**
+     * 按名称查找
+     *
+     * @param name 名称
+     * @return {@link AlipayTradeStatusEnum}
+     */
+    public static AlipayTradeStatusEnum findByName(String name) {
+        for (AlipayTradeStatusEnum statusEnum : AlipayTradeStatusEnum.values()) {
+            if (name.equalsIgnoreCase(statusEnum.name())) {
+                return statusEnum;
+            }
+        }
+        throw new RuntimeException("错误的支付宝支付状态");
     }
 }

@@ -2,7 +2,7 @@ package com.frank.apicommon.config;
 
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.stereotype.Component;
+import org.springframework.context.annotation.Configuration;
 
 /**
  * 阿里支付账户配置
@@ -11,7 +11,7 @@ import org.springframework.stereotype.Component;
  * @data 2024/06/22
  */
 @Data
-@Component
+@Configuration
 @ConfigurationProperties(prefix = "alipay")
 public class AliPayAccountConfig {
 
@@ -21,14 +21,19 @@ public class AliPayAccountConfig {
     private String appId;
 
     /**
-     * 商户私钥
+     * 卖家 Id
      */
-    private String privateKey;
+    private String sellerId;
 
     /**
-     * 支付宝公钥
+     * 是否使用沙箱
      */
-    private String aliPayPublicKey;
+    private Boolean sandbox;
+
+    /**
+     * 网关
+     */
+    private String gatewayUrl;
 
     /**
      * 异步通知 url
@@ -41,12 +46,17 @@ public class AliPayAccountConfig {
     private String returnUrl;
 
     /**
-     * 是否使用沙箱
+     * 应用私钥
      */
-    private Boolean sandbox;
+    private String privateKey;
 
     /**
-     * 卖家 Id
+     * 支付宝公钥
      */
-    private String sellerId;
+    private String aliPayPublicKey;
+
+    /**
+     * 接口内容加密秘钥
+     */
+    private String contentKey;
 }

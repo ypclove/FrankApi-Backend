@@ -1,8 +1,13 @@
 package com.frank.apicommon.utils;
 
+import com.frank.apicommon.config.EmailConfig;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
 
+import javax.mail.MessagingException;
+import javax.mail.internet.MimeMessage;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -104,5 +109,26 @@ public class EmailUtil {
         }
         // 替换 html 模板中的参数
         return MessageFormat.format(buffer.toString(), orderName, orderTotal, PLATFORM_RESPONSIBLE_PERSON, PATH_ADDRESS, EMAIL_TITLE);
+    }
+
+    /**
+     * 发送支付成功电子邮件
+     *
+     * @param emailAccount 电子邮件帐户
+     * @param mailSender   邮件发件人
+     * @param emailConfig  电子邮件配置
+     * @param orderName    订单名称
+     * @param orderTotal   订单总额
+     * @throws MessagingException 消息传递异常
+     */
+    public void sendPaySuccessEmail(String emailAccount, JavaMailSender mailSender, EmailConfig emailConfig, String orderName, String orderTotal) throws MessagingException {
+        MimeMessage message = mailSender.createMimeMessage();
+        // 邮箱发送内容组成
+        MimeMessageHelper helper = new MimeMessageHelper(message, true);
+        helper.setSubject("【" + EMAIL_TITLE + "】感谢您的购买，请查收您的订单");
+        helper.setText(buildPaySuccessEmailContent(EMAIL_HTML_PAY_SUCCESS_PATH, orderName, orderTotal), true);
+        helper.setTo(emailAccount);
+        helper.setFrom(EMAIL_TITLE + '<' + emailConfig.getEmailFrom() + '>');
+        mailSender.send(message);
     }
 }

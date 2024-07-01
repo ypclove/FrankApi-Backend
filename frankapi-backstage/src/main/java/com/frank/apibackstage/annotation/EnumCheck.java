@@ -12,11 +12,11 @@ import java.lang.annotation.*;
  * @author Frank
  * @date 2024/6/24
  */
-@Target({ElementType.METHOD, ElementType.FIELD, ElementType.ANNOTATION_TYPE, ElementType.CONSTRUCTOR, ElementType.PARAMETER, ElementType.TYPE_USE})
-@Retention(RetentionPolicy.RUNTIME)
-@Repeatable(EnumCheck.List.class)
 @Documented
+@Repeatable(EnumCheck.List.class)
+@Retention(RetentionPolicy.RUNTIME)
 @Constraint(validatedBy = EnumValidator.class)
+@Target({ElementType.METHOD, ElementType.FIELD, ElementType.ANNOTATION_TYPE, ElementType.CONSTRUCTOR, ElementType.PARAMETER, ElementType.TYPE_USE})
 public @interface EnumCheck {
 
     String message() default "";

@@ -9,24 +9,24 @@ import lombok.Getter;
  * @date 2024/6/22
  */
 @Getter
-public enum PayTypeStatusEnum {
+public enum PayTypeEnum {
 
     /**
      * 微信支付
      */
-    WX("微信支付", "WX"),
+    WX(1, "WX"),
 
     /**
      * 支付宝支付
      */
-    ALIPAY("支付宝支付", "ALIPAY");
+    ALIPAY(2, "ALIPAY");
+
+    private final int code;
 
     private final String text;
 
-    private final String value;
-
-    PayTypeStatusEnum(String text, String value) {
+    PayTypeEnum(int code, String text) {
+        this.code = code;
         this.text = text;
-        this.value = value;
     }
 }

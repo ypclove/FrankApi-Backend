@@ -5,7 +5,6 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.frank.apibackstage.annotation.AuthCheck;
 import com.frank.apibackstage.model.dto.interfaceinfo.*;
 import com.frank.apibackstage.model.entity.InterfaceInfo;
-import com.frank.apibackstage.model.entity.User;
 import com.frank.apibackstage.model.vo.UserVO;
 import com.frank.apibackstage.service.InterfaceInfoService;
 import com.frank.apibackstage.service.UserService;
@@ -14,12 +13,12 @@ import com.frank.apicommon.common.ResultUtils;
 import com.frank.apicommon.common.StatusCode;
 import com.frank.apicommon.constant.CommonConstant;
 import com.frank.apicommon.enums.InterfaceStatusEnum;
-import com.frank.apicommon.enums.UserRoleEnum;
 import com.frank.apicommon.exception.BusinessException;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
@@ -165,9 +164,10 @@ public class InterfaceInfoController {
                 .eq(ObjectUtils.isNotEmpty(reduceScore), "reduceScore", reduceScore);
         queryWrapper.orderBy(StringUtils.isNotBlank(sortField), sortOrder.equals(CommonConstant.SORT_ORDER_ASC), sortField);
         Page<InterfaceInfo> interfaceInfoPage = interfaceInfoService.page(new Page<>(current, pageSize), queryWrapper);
-        User user = userService.isTourist(request);
+
+        Boolean result = userService.isTourist(request);
         // 不是管理员只能查看已经开启的，不能查看"审核中"或者"关闭"的接口
-        if (Objects.isNull(user) || !user.getUserRole().equals(UserRoleEnum.ADMIN.getCode())) {
+        if (BooleanUtils.isTrue(result)) {
             List<InterfaceInfo> interfaceInfoList = interfaceInfoPage
                     .getRecords()
                     .stream()
@@ -290,8 +290,8 @@ public class InterfaceInfoController {
         Map<String, Object> params = new Gson().fromJson(requestParams, new TypeToken<Map<String, Object>>() {
         }.getType());
         UserVO loginUser = userService.getLoginUser(request);
-        String accessKey = loginUser.getAccessKey();
-        String secretKey = loginUser.getSecretKey();
+        // String accessKey = loginUser.getAccessKey();
+        // String secretKey = loginUser.getSecretKey();
         // TODO：继续优化
         // try {
         //     QiApiClient qiApiClient = new QiApiClient(accessKey, secretKey);

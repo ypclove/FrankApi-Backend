@@ -7,18 +7,18 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.frank.apibackstage.mapper.UserMapper;
-import com.frank.apibackstage.model.dto.user.*;
+import com.frank.apibackstage.model.convert.UserConvert;
 import com.frank.apibackstage.model.entity.User;
+import com.frank.apibackstage.model.request.UserRequest;
 import com.frank.apibackstage.model.vo.UserVO;
 import com.frank.apibackstage.service.EmailService;
 import com.frank.apibackstage.service.UserService;
 import com.frank.apicommon.common.StatusCode;
-import com.frank.apicommon.enums.UserAccountStatusEnum;
 import com.frank.apicommon.enums.UserRoleEnum;
+import com.frank.apicommon.enums.UserStatusEnum;
 import com.frank.apicommon.exception.BusinessException;
 import com.frank.apicommon.utils.RedissonLockUtil;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -31,10 +31,8 @@ import javax.servlet.http.HttpServletRequest;
 import java.util.Arrays;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
-import java.util.regex.Pattern;
 
 import static cn.hutool.core.util.RadixUtil.RADIXS_59;
-import static com.frank.apicommon.constant.EmailConstant.EMAIL_PATTERN;
 import static com.frank.apicommon.constant.RedisConstant.*;
 import static com.frank.apicommon.constant.UserConstant.*;
 
@@ -65,8 +63,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
      * @return 用户 Id
      */
     @Override
-    @Transactional(rollbackFor = Exception.class)
-    public Long userRegister(UserRegisterRequest userRegisterRequest) {
+    public Long userRegister(UserRequest userRegisterRequest) {
         String userAccount = userRegisterRequest.getUserAccount();
         String userPassword = userRegisterRequest.getUserPassword();
         String invitationCode = userRegisterRequest.getInvitationCode();
@@ -90,11 +87,10 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
                     throw new BusinessException(StatusCode.OPERATION_ERROR, "该邀请码无效");
                 }
             }
-            // 加密
             String encryptPassword = DigestUtils.md5DigestAsHex((SALT + userPassword).getBytes());
-            // accessKey / secretKey
-            String accessKey = DigestUtils.md5DigestAsHex((userAccount + SALT + VOUCHER).getBytes());
-            String secretKey = DigestUtils.md5DigestAsHex((SALT + VOUCHER + userAccount).getBytes());
+            // 设置 accessKey / secretKey 的时候，顺序不要随意变动
+            String accessKey = DigestUtils.md5DigestAsHex((userAccount + SALT + DEV_CRED).getBytes());
+            String secretKey = DigestUtils.md5DigestAsHex((SALT + DEV_CRED + userAccount).getBytes());
 
             // 插入数据
             User user = new User();
@@ -127,19 +123,18 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public long userEmailRegister(UserEmailRegisterRequest userEmailRegisterRequest) {
+    public Long userEmailRegister(UserRequest userEmailRegisterRequest) {
         String emailAccount = userEmailRegisterRequest.getEmailAccount();
-        String captcha = userEmailRegisterRequest.getCaptcha();
-        String invitationCode = userEmailRegisterRequest.getInvitationCode();
-
         String cacheCaptcha = redisTemplate.opsForValue().get(CAPTCHA_CACHE_KEY + emailAccount);
         if (StringUtils.isBlank(cacheCaptcha)) {
             throw new BusinessException(StatusCode.OPERATION_ERROR, "验证码已过期，请重新获取");
         }
-        captcha = captcha.trim();
-        if (!cacheCaptcha.equals(captcha)) {
+
+        String captcha = userEmailRegisterRequest.getCaptcha();
+        if (!cacheCaptcha.trim().equalsIgnoreCase(captcha.trim())) {
             throw new BusinessException(StatusCode.OPERATION_ERROR, "验证码输入有误");
         }
+
         String redissonLock = (CAPTCHA_CACHE_KEY + emailAccount).intern();
         return redissonLockUtil.redissonDistributedLocks(redissonLock, () -> {
             // 账户不能重复
@@ -149,28 +144,31 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
             if (count > 0) {
                 throw new BusinessException(StatusCode.PARAMS_ERROR, "账号重复");
             }
+
+            // 邀请码无效
             User invitationCodeUser = null;
+            String invitationCode = userEmailRegisterRequest.getInvitationCode();
             if (StringUtils.isNotBlank(invitationCode)) {
                 LambdaQueryWrapper<User> userLambdaQueryWrapper = new LambdaQueryWrapper<>();
                 userLambdaQueryWrapper.eq(User::getInvitationCode, invitationCode);
                 // 可能出现重复 invitationCode，查出的不是一条
                 invitationCodeUser = this.getOne(userLambdaQueryWrapper);
-                if (invitationCodeUser == null) {
+                if (Objects.isNull(invitationCodeUser)) {
                     throw new BusinessException(StatusCode.OPERATION_ERROR, "该邀请码无效");
                 }
             }
 
-            // accessKey / secretKey
-            String accessKey = DigestUtils.md5DigestAsHex((Arrays.toString(RandomUtil.randomBytes(ACCESS_KEY_RANDOM_BYTES_LENGTH)) + SALT + VOUCHER).getBytes());
-            String secretKey = DigestUtils.md5DigestAsHex((SALT + VOUCHER + Arrays.toString(RandomUtil.randomBytes(SECRET_KEY_RANDOM_BYTES_LENGTH))).getBytes());
+            // 生成 accessKey / secretKey
+            String accessKey = DigestUtils.md5DigestAsHex((Arrays.toString(RandomUtil.randomBytes(DEV_CRED_KEY_RANDOM_BYTES_LENGTH)) + SALT + DEV_CRED).getBytes());
+            String secretKey = DigestUtils.md5DigestAsHex((SALT + DEV_CRED + Arrays.toString(RandomUtil.randomBytes(DEV_CRED_KEY_RANDOM_BYTES_LENGTH))).getBytes());
 
             // 插入数据
             User user = new User();
             user.setUserAccount(emailAccount);
-            user.setAccessKey(accessKey);
             user.setEmail(emailAccount);
+            user.setAccessKey(accessKey);
             user.setSecretKey(secretKey);
-            if (invitationCodeUser != null) {
+            if (Objects.nonNull(invitationCodeUser)) {
                 // 通过邀请码注册，用户初始积分为 100，并且邀请人的积分 +100
                 user.setBalance(INIT_BALANCE);
                 this.addBalance(invitationCodeUser.getId(), INVITER_ADD_BALANCE);
@@ -190,26 +188,23 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
      * @param userAccount  用户账号
      * @param userPassword 用户密码
      * @param request      HttpServletRequest
-     * @return 用户信息
+     * @return 登录的用户信息
      */
     @Override
     public UserVO userLogin(String userAccount, String userPassword, HttpServletRequest request) {
-        // 加密
         String encryptPassword = DigestUtils.md5DigestAsHex((SALT + userPassword).getBytes());
         // 查询用户是否存在
         QueryWrapper<User> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("userAccount", userAccount);
-        queryWrapper.eq("userPassword", encryptPassword);
+        queryWrapper.eq("userAccount", userAccount).eq("userPassword", encryptPassword);
         User user = userMapper.selectOne(queryWrapper);
         // 用户不存在
-        if (user == null) {
+        if (Objects.isNull(user)) {
             throw new BusinessException(StatusCode.PARAMS_ERROR, "用户不存在或密码错误");
         }
-        if (user.getStatus().equals(UserAccountStatusEnum.BAN.getValue())) {
+        if (user.getStatus().equals(UserStatusEnum.BAN.getValue())) {
             throw new BusinessException(StatusCode.PROHIBITED, "该账号已封禁");
         }
-        UserVO userVO = new UserVO();
-        BeanUtils.copyProperties(user, userVO);
+        UserVO userVO = UserConvert.INSTANCE.convert(user);
         // 记录用户的登录态
         request.getSession().setAttribute(USER_LOGIN_STATE, userVO);
         return userVO;
@@ -220,36 +215,34 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
      *
      * @param userEmailLoginRequest 用户通过邮箱登录请求
      * @param request               HttpServletRequest
-     * @return 用户信息
+     * @return 登录的用户信息
      */
     @Override
-    public UserVO userEmailLogin(UserEmailLoginRequest userEmailLoginRequest, HttpServletRequest request) {
+    public UserVO userEmailLogin(UserRequest userEmailLoginRequest, HttpServletRequest request) {
         String emailAccount = userEmailLoginRequest.getEmailAccount();
-        String captcha = userEmailLoginRequest.getCaptcha();
-
-        String cacheCaptcha = redisTemplate.opsForValue().get(CAPTCHA_CACHE_KEY + emailAccount);
+        String cacheCaptcha = Objects.requireNonNull(redisTemplate.opsForValue().get(CAPTCHA_CACHE_KEY + emailAccount));
         if (StringUtils.isBlank(cacheCaptcha)) {
             throw new BusinessException(StatusCode.OPERATION_ERROR, "验证码已过期，请重新获取");
         }
-        captcha = captcha.trim();
-        if (!cacheCaptcha.equals(captcha)) {
+
+        String captcha = userEmailLoginRequest.getCaptcha();
+        if (!cacheCaptcha.trim().equalsIgnoreCase(captcha.trim())) {
             throw new BusinessException(StatusCode.OPERATION_ERROR, "验证码输入有误");
         }
+
         // 查询用户是否存在
         QueryWrapper<User> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("email", emailAccount);
         User user = userMapper.selectOne(queryWrapper);
-
-        // 用户不存在
-        if (user == null) {
+        if (Objects.isNull(user)) {
             throw new BusinessException(StatusCode.OPERATION_ERROR, "该邮箱未绑定账号，请先绑定账号");
         }
 
-        if (user.getStatus().equals(UserAccountStatusEnum.BAN.getValue())) {
+        // 用户状态
+        if (user.getStatus().equals(UserStatusEnum.BAN.getValue())) {
             throw new BusinessException(StatusCode.PROHIBITED, "账号已封禁");
         }
-        UserVO userVO = new UserVO();
-        BeanUtils.copyProperties(user, userVO);
+        UserVO userVO = UserConvert.INSTANCE.convert(user);
         // 记录用户的登录态
         request.getSession().setAttribute(USER_LOGIN_STATE, userVO);
         return userVO;
@@ -283,41 +276,42 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
      *
      * @param userBindEmailRequest 用户绑定邮件请求
      * @param request              HttpServletRequest
-     * @return 绑定邮件后的新用户信息
+     * @return 用户信息
      */
     @Override
-    public UserVO userBindEmail(UserBindEmailRequest userBindEmailRequest, HttpServletRequest request) {
+    public UserVO userBindEmail(UserRequest userBindEmailRequest, HttpServletRequest request) {
         String emailAccount = userBindEmailRequest.getEmailAccount();
-        String captcha = userBindEmailRequest.getCaptcha();
         String cacheCaptcha = redisTemplate.opsForValue().get(CAPTCHA_CACHE_KEY + emailAccount);
         if (StringUtils.isBlank(cacheCaptcha)) {
             throw new BusinessException(StatusCode.OPERATION_ERROR, "验证码已过期，请重新获取");
         }
-        captcha = captcha.trim();
-        if (!cacheCaptcha.equals(captcha)) {
+
+        String captcha = userBindEmailRequest.getCaptcha();
+        if (!cacheCaptcha.trim().equalsIgnoreCase(captcha.trim())) {
             throw new BusinessException(StatusCode.OPERATION_ERROR, "验证码输入有误");
         }
-        // 查询用户是否绑定该邮箱
+
+        // 查询该邮箱是否已经绑定该用户
         UserVO loginUser = this.getLoginUser(request);
-        if (loginUser.getEmail() != null && emailAccount.equals(loginUser.getEmail())) {
-            throw new BusinessException(StatusCode.OPERATION_ERROR, "该账号已绑定此邮箱，请更换新的邮箱！");
+        if (Objects.nonNull(loginUser.getEmail()) && emailAccount.equals(loginUser.getEmail())) {
+            throw new BusinessException(StatusCode.OPERATION_ERROR, "该账号已绑定此邮箱，请更换新的邮箱");
         }
-        // 查询邮箱是否已经绑定
+
+        // 查询该邮箱是否已经绑定其他用户
         QueryWrapper<User> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("email", emailAccount);
-        User user = this.getOne(queryWrapper);
-        if (user != null) {
-            throw new BusinessException(StatusCode.OPERATION_ERROR, "此邮箱已被绑定！");
+        User user = userMapper.selectOne(queryWrapper);
+        if (Objects.nonNull(user)) {
+            throw new BusinessException(StatusCode.OPERATION_ERROR, "此邮箱已被其他用户绑定，请更换新的邮箱");
         }
-        user = new User();
-        user.setId(loginUser.getId());
-        user.setEmail(emailAccount);
-        boolean bindEmailResult = this.updateById(user);
-        if (!bindEmailResult) {
-            throw new BusinessException(StatusCode.OPERATION_ERROR, "邮箱绑定失败！");
-        }
+
         loginUser.setEmail(emailAccount);
-        return loginUser;
+        User convertUser = UserConvert.INSTANCE.convert(loginUser);
+        int bindEmailResult = userMapper.updateById(convertUser);
+        if (bindEmailResult <= 0) {
+            throw new BusinessException(StatusCode.OPERATION_ERROR, "邮箱绑定失败");
+        }
+        return UserConvert.INSTANCE.convert(convertUser);
     }
 
     /**
@@ -325,43 +319,39 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
      *
      * @param userUnBindEmailRequest 用户解绑邮件请求
      * @param request                HttpServletRequest
-     * @return 解绑邮件后的新用户信息
+     * @return 用户信息
      */
     @Override
-    public UserVO userUnBindEmail(UserUnBindEmailRequest userUnBindEmailRequest, HttpServletRequest request) {
+    public UserVO userUnBindEmail(UserRequest userUnBindEmailRequest, HttpServletRequest request) {
         String emailAccount = userUnBindEmailRequest.getEmailAccount();
-        String captcha = userUnBindEmailRequest.getCaptcha();
-        if (StringUtils.isAnyBlank(emailAccount, captcha)) {
-            throw new BusinessException(StatusCode.PARAMS_ERROR);
-        }
-        if (!Pattern.matches(EMAIL_PATTERN, emailAccount)) {
-            throw new BusinessException(StatusCode.PARAMS_ERROR, "不合法的邮箱地址！");
-        }
         String cacheCaptcha = redisTemplate.opsForValue().get(CAPTCHA_CACHE_KEY + emailAccount);
         if (StringUtils.isBlank(cacheCaptcha)) {
             throw new BusinessException(StatusCode.OPERATION_ERROR, "验证码已过期，请重新获取");
         }
-        captcha = captcha.trim();
-        if (!cacheCaptcha.equals(captcha)) {
+
+        String captcha = userUnBindEmailRequest.getCaptcha();
+        if (!cacheCaptcha.trim().equalsIgnoreCase(captcha.trim())) {
             throw new BusinessException(StatusCode.OPERATION_ERROR, "验证码输入有误");
         }
+
         // 查询用户是否绑定该邮箱
         UserVO loginUser = this.getLoginUser(request);
-        if (loginUser.getEmail() == null) {
+        if (Objects.isNull(loginUser.getEmail())) {
             throw new BusinessException(StatusCode.OPERATION_ERROR, "该账号未绑定邮箱");
         }
+
+        // 如果绑定了，但是不是该邮箱，抛出异常
         if (!emailAccount.equals(loginUser.getEmail())) {
             throw new BusinessException(StatusCode.OPERATION_ERROR, "该账号未绑定此邮箱");
         }
-        User user = new User();
-        user.setId(loginUser.getId());
-        user.setEmail("");
-        boolean bindEmailResult = this.updateById(user);
-        if (!bindEmailResult) {
-            throw new BusinessException(StatusCode.OPERATION_ERROR, "邮箱解绑失败，请稍后再试！");
+
+        loginUser.setEmail("");
+        User user = UserConvert.INSTANCE.convert(loginUser);
+        int unBindEmailResult = userMapper.updateById(user);
+        if (unBindEmailResult <= 0) {
+            throw new BusinessException(StatusCode.OPERATION_ERROR, "邮箱解绑失败");
         }
-        loginUser.setEmail(null);
-        return loginUser;
+        return UserConvert.INSTANCE.convert(user);
     }
 
     /**
@@ -375,21 +365,19 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         // 先判断是否已登录
         Object userObj = request.getSession().getAttribute(USER_LOGIN_STATE);
         UserVO currentUser = (UserVO) userObj;
-        if (currentUser == null || currentUser.getId() == null) {
+        if (Objects.isNull(currentUser) || Objects.isNull(currentUser.getId())) {
             throw new BusinessException(StatusCode.NOT_LOGIN_ERROR);
         }
         // 从数据库查询（追求性能的话可以注释，直接走缓存）
         long userId = currentUser.getId();
         User user = this.getById(userId);
-        if (user == null) {
+        if (Objects.isNull(user)) {
             throw new BusinessException(StatusCode.NOT_LOGIN_ERROR);
         }
-        if (user.getStatus().equals(UserAccountStatusEnum.BAN.getValue())) {
+        if (user.getStatus().equals(UserStatusEnum.BAN.getValue())) {
             throw new BusinessException(StatusCode.PROHIBITED, "账号已封禁");
         }
-        UserVO userVO = new UserVO();
-        BeanUtils.copyProperties(user, userVO);
-        return userVO;
+        return UserConvert.INSTANCE.convert(user);
     }
 
     /**
@@ -399,8 +387,8 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
      * @return 用户退出登录是否成功
      */
     @Override
-    public boolean userLogout(HttpServletRequest request) {
-        if (ObjectUtils.anyNull(request.getSession().getAttribute(USER_LOGIN_STATE))) {
+    public Boolean userLogout(HttpServletRequest request) {
+        if (Objects.isNull(request.getSession().getAttribute(USER_LOGIN_STATE))) {
             throw new BusinessException(StatusCode.OPERATION_ERROR, "未登录");
         }
         // 移除登录态
@@ -415,7 +403,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
      * @return 用户 Id
      */
     @Override
-    public Long addUser(UserAddRequest userAddRequest) {
+    public Long addUser(UserRequest userAddRequest) {
         User user = new User();
         BeanUtils.copyProperties(userAddRequest, user);
         QueryWrapper<User> queryWrapper = new QueryWrapper<>();
@@ -424,9 +412,15 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         if (count > 0) {
             throw new BusinessException(StatusCode.PARAMS_ERROR, "账号重复");
         }
-        user.setInvitationCode(generateCaptcha(INVITATION_CODE_LENGTH));
+
         String encryptPassword = DigestUtils.md5DigestAsHex((SALT + user.getUserPassword()).getBytes());
+        String accessKey = DigestUtils.md5DigestAsHex((userAddRequest.getUserAccount() + SALT + DEV_CRED).getBytes());
+        String secretKey = DigestUtils.md5DigestAsHex((SALT + DEV_CRED + userAddRequest.getUserAccount()).getBytes());
+
+        user.setInvitationCode(generateCaptcha(INVITATION_CODE_LENGTH));
         user.setUserPassword(encryptPassword);
+        user.setAccessKey(accessKey);
+        user.setSecretKey(secretKey);
         boolean saveResult = this.save(user);
         if (!saveResult) {
             throw new BusinessException(StatusCode.SYSTEM_ERROR, "添加用户失败");
@@ -438,20 +432,77 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
      * 更新用户
      *
      * @param userUpdateRequest 更新用户请求
-     * @return 用户更新是否成功
+     * @return 更新之后的用户信息
      */
     @Override
-    public Boolean updateUser(UserUpdateRequest userUpdateRequest) {
+    public UserVO updateUser(UserRequest userUpdateRequest, HttpServletRequest request) {
+        UserVO loginUser = getLoginUser(request);
+        if (!loginUser.getUserRole().equals(UserRoleEnum.ADMIN.getCode()) || !userUpdateRequest.getId().equals(loginUser.getId())) {
+            throw new BusinessException(StatusCode.NO_AUTH_ERROR, "操作无权限");
+        }
         User user = new User();
         BeanUtils.copyProperties(userUpdateRequest, user);
-        String encryptPassword = DigestUtils.md5DigestAsHex((SALT + user.getUserPassword()).getBytes());
-        user.setUserPassword(encryptPassword);
-        int result = userMapper.updateById(user);
-        if (!(result > 0)) {
+        String userAccount = user.getUserAccount();
+        // 账户不能重复
+        if (StringUtils.isNotBlank(userAccount)) {
+            QueryWrapper<User> queryWrapper = new QueryWrapper<>();
+            // 排除当前用户
+            queryWrapper.eq("userAccount", userAccount).ne("id", user.getId());
+            long count = userMapper.selectCount(queryWrapper);
+            if (count > 0) {
+                throw new BusinessException(StatusCode.PARAMS_ERROR, "该账号已使用，请重换一个");
+            }
+        }
+        QueryWrapper<User> wrapper = new QueryWrapper<>();
+        wrapper.eq("id", user.getId());
+        int result = userMapper.update(user, wrapper);
+        if (result <= 0) {
             throw new BusinessException(StatusCode.OPERATION_ERROR, "更新用户失败");
         }
-        return true;
+        return UserConvert.INSTANCE.convert(user);
     }
+
+    /**
+     * 通过邀请码查询用户
+     *
+     * @param invitationCode 邀请码
+     * @return 用户信息
+     */
+    @Override
+    public UserVO getUserByInvitationCode(String invitationCode) {
+        LambdaQueryWrapper<User> userLambdaQueryWrapper = new LambdaQueryWrapper<>();
+        userLambdaQueryWrapper.eq(User::getInvitationCode, invitationCode);
+        User invitationCodeUser = userMapper.selectOne(userLambdaQueryWrapper);
+        if (Objects.isNull(invitationCodeUser)) {
+            throw new BusinessException(StatusCode.NOT_FOUND_ERROR, "邀请码不存在");
+        }
+        return UserConvert.INSTANCE.convert(invitationCodeUser);
+    }
+
+    /**
+     * 更新开发者凭证
+     *
+     * @param request HttpServletRequest
+     * @return 更新之后的用户信息
+     */
+    @Override
+    public UserVO updateDevCred(HttpServletRequest request) {
+        if (Objects.isNull(request)) {
+            throw new BusinessException(StatusCode.PARAMS_ERROR);
+        }
+        UserVO loginUser = getLoginUser(request);
+        User user = UserConvert.INSTANCE.convert(loginUser);
+        String accessKey = DigestUtils.md5DigestAsHex((Arrays.toString(RandomUtil.randomBytes(DEV_CRED_KEY_RANDOM_BYTES_LENGTH)) + SALT + DEV_CRED).getBytes());
+        String secretKey = DigestUtils.md5DigestAsHex((SALT + DEV_CRED + Arrays.toString(RandomUtil.randomBytes(DEV_CRED_KEY_RANDOM_BYTES_LENGTH))).getBytes());
+        user.setAccessKey(accessKey);
+        user.setSecretKey(secretKey);
+        int result = userMapper.updateById(user);
+        if (result <= 0) {
+            throw new BusinessException(StatusCode.OPERATION_ERROR, "开发者凭证更新失败");
+        }
+        return UserConvert.INSTANCE.convert(user);
+    }
+
 
     /**
      * 用户通过邀请码注册成功时，增加邀请人的积分
@@ -460,7 +511,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
      * @param addBalanceNumber 添加积分
      */
     @Override
-    public boolean addBalance(Long userId, Integer addBalanceNumber) {
+    public Boolean addBalance(Long userId, Integer addBalanceNumber) {
         LambdaUpdateWrapper<User> userLambdaUpdateWrapper = new LambdaUpdateWrapper<>();
         userLambdaUpdateWrapper.eq(User::getId, userId);
         userLambdaUpdateWrapper.setSql("balance = balance + " + addBalanceNumber);
@@ -474,7 +525,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
      * @return 是否为管理员
      */
     @Override
-    public boolean isAdmin(HttpServletRequest request) {
+    public Boolean isAdmin(HttpServletRequest request) {
         Object userObj = request.getSession().getAttribute(USER_LOGIN_STATE);
         UserVO currentUser = (UserVO) userObj;
         if (Objects.isNull(currentUser) || Objects.isNull(currentUser.getId())) {
@@ -482,7 +533,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         }
         // 从数据库查询，TODO：追求性能的话可以注释，直接走缓存
         long userId = currentUser.getId();
-        User user = this.getById(userId);
+        User user = userMapper.selectById(userId);
         return Objects.nonNull(user) && user.getUserRole().equals(UserRoleEnum.ADMIN.getCode());
     }
 
@@ -493,24 +544,27 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
      * @return 游客信息
      */
     @Override
-    public User isTourist(HttpServletRequest request) {
+    public Boolean isTourist(HttpServletRequest request) {
         Object userObj = request.getSession().getAttribute(USER_LOGIN_STATE);
         UserVO currentUser = (UserVO) userObj;
         if (Objects.isNull(currentUser) || Objects.isNull(currentUser.getId())) {
-            return null;
+            throw new BusinessException(StatusCode.NOT_LOGIN_ERROR);
         }
         // 从数据库查询，TODO：追求性能的话可以注释，直接走缓存
         long userId = currentUser.getId();
-        return this.getById(userId);
+        User user = userMapper.selectById(userId);
+        return Objects.nonNull(user) && user.getUserRole().equals(UserRoleEnum.USER.getCode());
     }
 
     /**
      * 生成校验码（验证码 / 邀请码）
+     * 字符集：A-Z，a-z，0-9
      *
      * @param length 长度
      * @return 校验码
      */
     private String generateCaptcha(Integer length) {
+        // 或者使用 RandomStringUtils.randomAlphanumeric(length)
         return RandomUtil.randomString(RADIXS_59, length);
     }
 }

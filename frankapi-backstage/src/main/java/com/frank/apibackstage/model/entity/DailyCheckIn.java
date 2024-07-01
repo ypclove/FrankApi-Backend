@@ -42,7 +42,7 @@ public class DailyCheckIn implements Serializable {
      * 签到增加积分个数
      */
     @TableField("addPoints")
-    private Long addPoints;
+    private Integer addPoints;
 
     /**
      * 创建时间
@@ -55,4 +55,13 @@ public class DailyCheckIn implements Serializable {
      */
     @TableField(value = "updateTime", fill = FieldFill.INSERT_UPDATE)
     private Date updateTime;
+
+    /**
+     * 逻辑删除
+     * 0：未删除
+     * 1：已删除
+     */
+    @TableLogic
+    @TableField("isDelete")
+    private Integer isDelete;
 }

@@ -1,7 +1,7 @@
 package com.frank.apibackstage.inner;
 
 
-import com.frank.apibackstage.model.vo.UserVO;
+import com.frank.apibackstage.model.request.UserRequest;
 
 /**
  * 用户服务
@@ -17,5 +17,5 @@ public interface InnerUserService {
      * @param accessKey 访问密钥
      * @return invoke 用户
      */
-    UserVO getInvokeUserByAccessKey(String accessKey);
+    UserRequest getInvokeUserByAccessKey(String accessKey);
 }

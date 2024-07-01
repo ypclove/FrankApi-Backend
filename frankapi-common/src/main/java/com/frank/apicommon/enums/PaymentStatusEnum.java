@@ -14,54 +14,54 @@ public enum PaymentStatusEnum {
     /**
      * 支付成功
      */
-    SUCCESS("支付成功", "SUCCESS"),
+    SUCCESS(1, "SUCCESS"),
 
     /**
      * 转入退款
      */
-    REFUND("转入退款", "REFUND"),
+    REFUND(2, "REFUND"),
 
     /**
      * 未支付
      */
-    NOTPAY("未支付", "NOTPAY"),
+    NOTPAY(3, "NOTPAY"),
 
     /**
      * 已关闭
      */
-    CLOSED("已关闭", "CLOSED"),
+    CLOSED(4, "CLOSED"),
 
     /**
      * 撤销
      */
-    REVOKED("已撤销（刷卡支付）", "REVOKED"),
+    REVOKED(5, "REVOKED"),
+
+    /**
+     * 用户支付中
+     */
+    USERPAYING(6, "USERPAYING"),
 
     /**
      * 支付失败
      */
-    PAY_ERROR("支付失败", "PAYERROR"),
-
-    /**
-     * 用户付费中
-     */
-    USER_PAYING("用户支付中", "USER_PAYING"),
+    PAYERROR(7, "PAYERROR"),
 
     /**
      * 退款中
      */
-    PROCESSING("退款中", "PROCESSING"),
+    PROCESSING(8, "PROCESSING"),
 
     /**
      * 未知
      */
-    UNKNOW("未知状态", "UNKNOW");
+    UNKNOW(9, "UNKNOW");
+
+    private final int code;
 
     private final String text;
 
-    private final String value;
-
-    PaymentStatusEnum(String text, String value) {
+    PaymentStatusEnum(int code, String text) {
+        this.code = code;
         this.text = text;
-        this.value = value;
     }
 }

@@ -25,7 +25,7 @@ spring:
   redis:
     database: 0
     host: xxxxxxxx
-    port: xxxxxxxx
+    port: 6379
     # password: xxxxxxxx
     timeout: 86400
   #  邮箱配置
@@ -67,8 +67,8 @@ wx:
     mchId: xxxxxxxx
     apiV3Key: xxxxxxxx
     sandbox: false # 是否沙箱环境
-    privateKeyPath: classpath:/pem/apiclient_key.pem
-    privateCertPath: classpath:/pem/apiclient_cert.pem
+    privateKeyPath: xxxxxxxx
+    privateCertPath: xxxxxxxx
     # 本地测试用 ngrok 内网穿透
     notifyUrl: https://beloved-massive-sheepdog.ngrok-free.app/api/order/notify/order
 # 支付宝支付配置
@@ -76,12 +76,19 @@ alipay:
   appId: xxxxxxxx
   sellerId: xxxxxxxx
   # 是否沙箱环境
-  sandbox: false
+  sandbox: true
+  # 支付宝网关
+  gateway-url: https://openapi-sandbox.dl.alipaydev.com/gateway.do
   # 本地测试用 ngrok 内网穿透
-  notifyUrl: https://beloved-massive-sheepdog.ngrok-free.app/api/order/notify/order
-  returnUrl: http://localhost:8000/account/center
+  # notifyUrl: https://beloved-massive-sheepdog.ngrok-free.app/api/order/notify/order
+  notifyUrl: https://a863-180-174-204-169.ngrok.io/api/ali-pay/trade/notify
+  returnUrl: xxxxxxxx
+  # 应用私钥
   private-key: xxxxxxxx
-  ali-pay-public-key: xxxxxxxx
+  # 支付宝公钥（对）
+  alipay-public-key: xxxxxxxx
+  # 接口内容加密秘钥，对称秘钥
+  content-key: xxxxxxxx
 dubbo:
   application:
     enable-file-cache: false

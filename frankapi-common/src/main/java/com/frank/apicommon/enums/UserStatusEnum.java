@@ -9,7 +9,7 @@ import lombok.Getter;
  * @date 2024/6/22
  */
 @Getter
-public enum UserAccountStatusEnum {
+public enum UserStatusEnum {
 
     /**
      * 正常
@@ -25,7 +25,7 @@ public enum UserAccountStatusEnum {
 
     private final int value;
 
-    UserAccountStatusEnum(String text, int value) {
+    UserStatusEnum(String text, int value) {
         this.text = text;
         this.value = value;
     }

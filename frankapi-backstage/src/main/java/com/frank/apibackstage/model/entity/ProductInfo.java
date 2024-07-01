@@ -46,7 +46,7 @@ public class ProductInfo implements Serializable {
      * 产品金额（单位：分）
      */
     @TableField("total")
-    private Long total;
+    private Integer total;
 
     /**
      * 增加积分个数

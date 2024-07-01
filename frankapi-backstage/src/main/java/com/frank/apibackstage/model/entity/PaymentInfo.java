@@ -52,7 +52,7 @@ public class PaymentInfo implements Serializable {
      * CLOSED：已关闭
      * REVOKED：已撤销（仅付款码支付会返回）
      * USERPAYING：用户支付中（仅付款码支付会返回）
-     * PAYERROR：支付失败（仅付款码支付会返回）)
+     * PAYERROR：支付失败（仅付款码支付会返回）
      */
     @TableField("tradeState")
     private String tradeState;
@@ -79,7 +79,7 @@ public class PaymentInfo implements Serializable {
      * 用户支付金额
      */
     @TableField("payerTotal")
-    private Long payerTotal;
+    private Integer payerTotal;
 
     /**
      * 货币类型
@@ -103,7 +103,7 @@ public class PaymentInfo implements Serializable {
      * 总金额
      */
     @TableField("total")
-    private Long total;
+    private Integer total;
 
     /**
      * 创建时间
@@ -116,4 +116,13 @@ public class PaymentInfo implements Serializable {
      */
     @TableField(value = "updateTime", fill = FieldFill.INSERT_UPDATE)
     private Date updateTime;
+
+    /**
+     * 逻辑删除
+     * 0：未删除；
+     * 1：已删除
+     */
+    @TableLogic
+    @TableField("isDelete")
+    private Integer isDelete;
 }
