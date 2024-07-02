@@ -1,14 +1,5 @@
 package com.frank.apicommon.constant;
 
-import com.frank.apicommon.utils.AESUtil;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.util.Base64;
-
-import static java.util.Base64.getDecoder;
-import static java.util.Base64.getEncoder;
-
 /**
  * @author Frank
  * @date 2024/6/26
@@ -34,21 +25,6 @@ public class EncryptConstant {
      * 签名摘要算法
      */
     public static final String SIGN_ALGORITHM = "SHA256WithRSA";
-
-    /**
-     * Base64 编码器
-     */
-    public static final Base64.Encoder BASE64_ENCODER = getEncoder();
-
-    /**
-     * Base64 解码器
-     */
-    public static final Base64.Decoder BASE64_DECODER = getDecoder();
-
-    /**
-     * 日志记录器
-     */
-    public static final Logger LOG = LoggerFactory.getLogger(AESUtil.class);
 
     /**
      * 解密请求超时时间

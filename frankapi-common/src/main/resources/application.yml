@@ -5,7 +5,7 @@ server:
     context-path: /api
     session:
       cookie:
-        max-age: 604800
+        max-age: 604800  # 有效期：一周
 spring:
   profiles:
     active: dev
@@ -79,7 +79,7 @@ alipay:
   sandbox: false
   # 本地测试用 ngrok 内网穿透
   notifyUrl: https://beloved-massive-sheepdog.ngrok-free.app/api/order/notify/order
-  returnUrl: xxxxxxxx
+  returnUrl: http://localhost:8000/account/center
   private-key: xxxxxxxx
   ali-pay-public-key: xxxxxxxx
 dubbo:

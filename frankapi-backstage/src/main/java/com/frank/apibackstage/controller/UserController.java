@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.plugins.pagination.PageDTO;
 import com.frank.apibackstage.annotation.AuthCheck;
+import com.frank.apibackstage.annotation.Encrypt;
 import com.frank.apibackstage.model.entity.User;
 import com.frank.apibackstage.model.request.UserRequest;
 import com.frank.apibackstage.model.validgroup.UserValidGroup;
@@ -86,6 +87,7 @@ public class UserController {
      * @param request          HttpServletRequest
      * @return 登录的用户信息
      */
+    @Encrypt
     @PostMapping("/login")
     public BaseResponse<UserVO> userLogin(@Validated(value = UserValidGroup.Login.PlateLogin.class)
                                           @RequestBody UserRequest userLoginRequest, HttpServletRequest request) {
@@ -222,7 +224,7 @@ public class UserController {
      * 更新用户
      *
      * @param userUpdateRequest 更新用户请求
-     * @param request HttpServletRequest
+     * @param request           HttpServletRequest
      * @return 更新之后的用户信息
      */
     @PostMapping("/update")

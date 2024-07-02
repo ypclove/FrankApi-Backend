@@ -7,6 +7,8 @@ server:
       cookie:
         max-age: 604800
 spring:
+  encrypt:
+    key: 'frank'
   profiles:
     active: dev
   application:
@@ -25,7 +27,7 @@ spring:
   redis:
     database: 0
     host: xxxxxxxx
-    port: 6379
+    port: xxxxxxxx
     # password: xxxxxxxx
     timeout: 86400
   #  邮箱配置
@@ -67,8 +69,8 @@ wx:
     mchId: xxxxxxxx
     apiV3Key: xxxxxxxx
     sandbox: false # 是否沙箱环境
-    privateKeyPath: xxxxxxxx
-    privateCertPath: xxxxxxxx
+    privateKeyPath: classpath:/pem/apiclient_key.pem
+    privateCertPath: classpath:/pem/apiclient_cert.pem
     # 本地测试用 ngrok 内网穿透
     notifyUrl: https://beloved-massive-sheepdog.ngrok-free.app/api/order/notify/order
 # 支付宝支付配置
@@ -82,7 +84,7 @@ alipay:
   # 本地测试用 ngrok 内网穿透
   # notifyUrl: https://beloved-massive-sheepdog.ngrok-free.app/api/order/notify/order
   notifyUrl: https://a863-180-174-204-169.ngrok.io/api/ali-pay/trade/notify
-  returnUrl: xxxxxxxx
+  returnUrl: http://localhost:8000/account/center
   # 应用私钥
   private-key: xxxxxxxx
   # 支付宝公钥（对）
