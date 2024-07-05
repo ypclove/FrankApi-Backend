@@ -26,8 +26,8 @@ spring:
     store-type: redis
   redis:
     database: 0
-    host: xxxxxxxx
-    port: xxxxxxxx
+    host: localhost
+    port: 6379
     # password: xxxxxxxx
     timeout: 86400
   #  邮箱配置
@@ -83,12 +83,14 @@ alipay:
   gateway-url: https://openapi-sandbox.dl.alipaydev.com/gateway.do
   # 本地测试用 ngrok 内网穿透
   # notifyUrl: https://beloved-massive-sheepdog.ngrok-free.app/api/order/notify/order
-  notifyUrl: https://a863-180-174-204-169.ngrok.io/api/ali-pay/trade/notify
-  returnUrl: http://localhost:8000/account/center
+  notifyUrl: xxxxxxxx
+  returnUrl: xxxxxxxx
   # 应用私钥
   private-key: xxxxxxxx
   # 支付宝公钥（对）
   alipay-public-key: xxxxxxxx
+  # 应用公钥
+  # alipay-public-key: xxxxxxxx
   # 接口内容加密秘钥，对称秘钥
   content-key: xxxxxxxx
 dubbo:

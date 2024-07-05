@@ -19,7 +19,7 @@ import java.util.Objects;
 
 /**
  * @author Frank
- * @data 2024/06/22
+ * @date 2024/06/22
  */
 @Service
 public class ProductInfoServiceImpl extends ServiceImpl<ProductInfoMapper, ProductInfo> implements ProductInfoService {

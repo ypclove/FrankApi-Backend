@@ -13,7 +13,7 @@ import java.io.Serializable;
 @Data
 public class AliPayAsyncResponse implements Serializable {
 
-    private static final long serialVersionUID = 1061553753198699097L;
+    private static final long serialVersionUID = 1L;
 
     /**
      * 通知时间

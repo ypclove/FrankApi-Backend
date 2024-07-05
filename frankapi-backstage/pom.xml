@@ -130,6 +130,14 @@
             <groupId>org.mapstruct</groupId>
             <artifactId>mapstruct-processor</artifactId>
         </dependency>
+        <dependency>
+            <groupId>commons-httpclient</groupId>
+            <artifactId>commons-httpclient</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.frank</groupId>
+            <artifactId>FrankApi-SDK</artifactId>
+        </dependency>
     </dependencies>
 
     <build>

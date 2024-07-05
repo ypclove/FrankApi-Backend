@@ -15,7 +15,7 @@ import java.util.function.Supplier;
  * 分布式锁工具类
  *
  * @author Frank
- * @data 2024/06/22
+ * @date 2024/06/22
  */
 @Slf4j
 @Component

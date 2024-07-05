@@ -1,15 +1,15 @@
 package com.frank.apibackstage.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.frank.apibackstage.model.dto.user.*;
 import com.frank.apibackstage.model.entity.User;
-import com.frank.apibackstage.model.request.UserRequest;
 import com.frank.apibackstage.model.vo.UserVO;
 
 import javax.servlet.http.HttpServletRequest;
 
 /**
  * @author Frank
- * @data 2024/06/22
+ * @date 2024/06/22
  */
 public interface UserService extends IService<User> {
 
@@ -19,7 +19,7 @@ public interface UserService extends IService<User> {
      * @param userRegisterRequest 用户注册请求
      * @return 用户 Id
      */
-    Long userRegister(UserRequest userRegisterRequest);
+    Long userRegister(UserRegisterRequest userRegisterRequest);
 
     /**
      * 用户通过邮件注册
@@ -27,7 +27,7 @@ public interface UserService extends IService<User> {
      * @param userEmailRegisterRequest 用户通过邮件注册请求
      * @return 用户 Id
      */
-    Long userEmailRegister(UserRequest userEmailRegisterRequest);
+    Long userEmailRegister(UserEmailRegisterRequest userEmailRegisterRequest);
 
     /**
      * 用户登录
@@ -46,7 +46,7 @@ public interface UserService extends IService<User> {
      * @param request               HttpServletRequest
      * @return 登录的用户信息
      */
-    UserVO userEmailLogin(UserRequest userEmailLoginRequest, HttpServletRequest request);
+    UserVO userEmailLogin(UserEmailLoginRequest userEmailLoginRequest, HttpServletRequest request);
 
     /**
      * 获取验证码
@@ -63,7 +63,7 @@ public interface UserService extends IService<User> {
      * @param request              HttpServletRequest
      * @return 用户信息
      */
-    UserVO userBindEmail(UserRequest userBindEmailRequest, HttpServletRequest request);
+    UserVO userBindEmail(UserBindEmailRequest userBindEmailRequest, HttpServletRequest request);
 
     /**
      * 用户解绑邮件
@@ -72,7 +72,7 @@ public interface UserService extends IService<User> {
      * @param request                HttpServletRequest
      * @return 用户信息
      */
-    UserVO userUnBindEmail(UserRequest userUnBindEmailRequest, HttpServletRequest request);
+    UserVO userUnBindEmail(UserUnBindEmailRequest userUnBindEmailRequest, HttpServletRequest request);
 
     /**
      * 获取当前登录用户
@@ -96,7 +96,7 @@ public interface UserService extends IService<User> {
      * @param userAddRequest 添加用户请求
      * @return 用户 Id
      */
-    Long addUser(UserRequest userAddRequest);
+    Long addUser(UserAddRequest userAddRequest);
 
     /**
      * 更新用户
@@ -104,7 +104,7 @@ public interface UserService extends IService<User> {
      * @param userUpdateRequest 用户更新请求
      * @return 更新之后的用户信息
      */
-    UserVO updateUser(UserRequest userUpdateRequest, HttpServletRequest request);
+    UserVO updateUser(UserUpdateRequest userUpdateRequest, HttpServletRequest request);
 
     /**
      * 通过邀请码查询用户

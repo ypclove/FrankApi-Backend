@@ -8,7 +8,7 @@ import org.springframework.stereotype.Service;
 
 /**
  * @author Frank
- * @data 2024/06/22
+ * @date 2024/06/22
  */
 @Service
 public class RechargeActivityServiceImpl extends ServiceImpl<RechargeActivityMapper, RechargeActivity> implements RechargeActivityService {

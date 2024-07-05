@@ -29,5 +29,5 @@ public class ResponseParamsField {
     /**
      * 接口响应描述
      */
-    private String desc;
+    private Integer desc;
 }

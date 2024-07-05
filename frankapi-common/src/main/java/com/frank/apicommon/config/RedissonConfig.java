@@ -12,7 +12,7 @@ import org.springframework.context.annotation.Configuration;
  * Redisson 配置
  *
  * @author Frank
- * @data 2024/06/22
+ * @date 2024/06/22
  */
 @Data
 @Configuration
@@ -29,7 +29,7 @@ public class RedissonConfig {
         Config config = new Config();
         String redisAddress = String.format("redis://%s:%s", host, port);
         config.useSingleServer()
-                .setDatabase(3)
+                .setDatabase(database)
                 .setAddress(redisAddress)
                 .setPassword(password);
         return Redisson.create(config);

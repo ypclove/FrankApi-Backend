@@ -7,7 +7,7 @@ import lombok.Getter;
  * 自定义异常类
  *
  * @author Frank
- * @data 2024/06/22
+ * @date 2024/06/22
  */
 @Getter
 public class BusinessException extends RuntimeException {

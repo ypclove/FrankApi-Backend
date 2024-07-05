@@ -1,11 +1,11 @@
 package com.frank.apibackstage.controller;
 
+import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.frank.apibackstage.annotation.AuthCheck;
 import com.frank.apibackstage.model.dto.interfaceinfo.*;
 import com.frank.apibackstage.model.entity.InterfaceInfo;
-import com.frank.apibackstage.model.vo.UserVO;
 import com.frank.apibackstage.service.InterfaceInfoService;
 import com.frank.apibackstage.service.UserService;
 import com.frank.apicommon.common.BaseResponse;
@@ -14,9 +14,6 @@ import com.frank.apicommon.common.StatusCode;
 import com.frank.apicommon.constant.CommonConstant;
 import com.frank.apicommon.enums.InterfaceStatusEnum;
 import com.frank.apicommon.exception.BusinessException;
-import com.google.gson.Gson;
-import com.google.gson.JsonObject;
-import com.google.gson.reflect.TypeToken;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.ObjectUtils;
@@ -32,7 +29,6 @@ import javax.validation.Valid;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
@@ -51,8 +47,6 @@ public class InterfaceInfoController {
 
     @Resource
     private InterfaceInfoService interfaceInfoService;
-
-    private final Gson gson = new Gson();
 
     /**
      * 创建接口
@@ -268,42 +262,9 @@ public class InterfaceInfoController {
      */
     @PostMapping("/invoke")
     @Transactional(rollbackFor = Exception.class)
-    public BaseResponse<Object> invokeInterface(@Valid @RequestBody InvokeRequest invokeRequest,
-                                                HttpServletRequest request) {
-        InterfaceInfo interfaceInfo = interfaceInfoService.getById(invokeRequest.getId());
-        if (Objects.isNull(interfaceInfo)) {
-            throw new BusinessException(StatusCode.NOT_FOUND_ERROR);
-        }
-        if (!interfaceInfo.getStatus().equals(InterfaceStatusEnum.ONLINE.getCode())) {
-            throw new BusinessException(StatusCode.PARAMS_ERROR, "接口未开启");
-        }
-        // 构建请求参数
-        List<InvokeRequest.Field> fieldList = invokeRequest.getRequestParams();
-        String requestParams = "{}";
-        if (fieldList != null && !fieldList.isEmpty()) {
-            JsonObject jsonObject = new JsonObject();
-            for (InvokeRequest.Field field : fieldList) {
-                jsonObject.addProperty(field.getFieldName(), field.getValue());
-            }
-            requestParams = gson.toJson(jsonObject);
-        }
-        Map<String, Object> params = new Gson().fromJson(requestParams, new TypeToken<Map<String, Object>>() {
-        }.getType());
-        UserVO loginUser = userService.getLoginUser(request);
-        // String accessKey = loginUser.getAccessKey();
-        // String secretKey = loginUser.getSecretKey();
-        // TODO：继续优化
-        // try {
-        //     QiApiClient qiApiClient = new QiApiClient(accessKey, secretKey);
-        //     CurrencyRequest currencyRequest = new CurrencyRequest();
-        //     currencyRequest.setMethod(interfaceInfo.getMethod());
-        //     currencyRequest.setPath(interfaceInfo.getUrl());
-        //     currencyRequest.setRequestParams(params);
-        //     ResultResponse response = apiService.request(qiApiClient, currencyRequest);
-        //     return ResultUtils.success(response.getData());
-        // } catch (Exception e) {
-        //     throw new BusinessException(ErrorCode.SYSTEM_ERROR, e.getMessage());
-        // }
-        return ResultUtils.success(1);
+    public BaseResponse<JSONObject> invokeInterface(@Valid @RequestBody InvokeRequest invokeRequest,
+                                                    HttpServletRequest request) {
+        JSONObject response = interfaceInfoService.invokeInterface(invokeRequest, request);
+        return ResultUtils.success(response);
     }
 }

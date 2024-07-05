@@ -4,7 +4,7 @@ package com.frank.apicommon.constant;
  * 通用常量类
  *
  * @author Frank
- * @data 2024/06/22
+ * @date 2024/06/22
  */
 public class CommonConstant {
 

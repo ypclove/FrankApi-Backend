@@ -18,7 +18,7 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
  * swagger 的文档地址：http://ip:port/swagger-ui.html
  *
  * @author Frank
- * @data 2024/06/22
+ * @date 2024/06/22
  */
 @Configuration
 @EnableSwagger2

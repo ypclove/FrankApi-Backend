@@ -8,8 +8,8 @@ import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.frank.apibackstage.mapper.UserMapper;
 import com.frank.apibackstage.model.convert.UserConvert;
+import com.frank.apibackstage.model.dto.user.*;
 import com.frank.apibackstage.model.entity.User;
-import com.frank.apibackstage.model.request.UserRequest;
 import com.frank.apibackstage.model.vo.UserVO;
 import com.frank.apibackstage.service.EmailService;
 import com.frank.apibackstage.service.UserService;
@@ -38,7 +38,7 @@ import static com.frank.apicommon.constant.UserConstant.*;
 
 /**
  * @author Frank
- * @data 2024/06/22
+ * @date 2024/06/22
  */
 @Slf4j
 @Service
@@ -63,7 +63,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
      * @return 用户 Id
      */
     @Override
-    public Long userRegister(UserRequest userRegisterRequest) {
+    public Long userRegister(UserRegisterRequest userRegisterRequest) {
         String userAccount = userRegisterRequest.getUserAccount();
         String userPassword = userRegisterRequest.getUserPassword();
         String invitationCode = userRegisterRequest.getInvitationCode();
@@ -123,7 +123,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public Long userEmailRegister(UserRequest userEmailRegisterRequest) {
+    public Long userEmailRegister(UserEmailRegisterRequest userEmailRegisterRequest) {
         String emailAccount = userEmailRegisterRequest.getEmailAccount();
         String cacheCaptcha = redisTemplate.opsForValue().get(CAPTCHA_CACHE_KEY + emailAccount);
         if (StringUtils.isBlank(cacheCaptcha)) {
@@ -218,7 +218,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
      * @return 登录的用户信息
      */
     @Override
-    public UserVO userEmailLogin(UserRequest userEmailLoginRequest, HttpServletRequest request) {
+    public UserVO userEmailLogin(UserEmailLoginRequest userEmailLoginRequest, HttpServletRequest request) {
         String emailAccount = userEmailLoginRequest.getEmailAccount();
         String cacheCaptcha = Objects.requireNonNull(redisTemplate.opsForValue().get(CAPTCHA_CACHE_KEY + emailAccount));
         if (StringUtils.isBlank(cacheCaptcha)) {
@@ -279,7 +279,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
      * @return 用户信息
      */
     @Override
-    public UserVO userBindEmail(UserRequest userBindEmailRequest, HttpServletRequest request) {
+    public UserVO userBindEmail(UserBindEmailRequest userBindEmailRequest, HttpServletRequest request) {
         String emailAccount = userBindEmailRequest.getEmailAccount();
         String cacheCaptcha = redisTemplate.opsForValue().get(CAPTCHA_CACHE_KEY + emailAccount);
         if (StringUtils.isBlank(cacheCaptcha)) {
@@ -322,7 +322,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
      * @return 用户信息
      */
     @Override
-    public UserVO userUnBindEmail(UserRequest userUnBindEmailRequest, HttpServletRequest request) {
+    public UserVO userUnBindEmail(UserUnBindEmailRequest userUnBindEmailRequest, HttpServletRequest request) {
         String emailAccount = userUnBindEmailRequest.getEmailAccount();
         String cacheCaptcha = redisTemplate.opsForValue().get(CAPTCHA_CACHE_KEY + emailAccount);
         if (StringUtils.isBlank(cacheCaptcha)) {
@@ -403,7 +403,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
      * @return 用户 Id
      */
     @Override
-    public Long addUser(UserRequest userAddRequest) {
+    public Long addUser(UserAddRequest userAddRequest) {
         User user = new User();
         BeanUtils.copyProperties(userAddRequest, user);
         QueryWrapper<User> queryWrapper = new QueryWrapper<>();
@@ -435,7 +435,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
      * @return 更新之后的用户信息
      */
     @Override
-    public UserVO updateUser(UserRequest userUpdateRequest, HttpServletRequest request) {
+    public UserVO updateUser(UserUpdateRequest userUpdateRequest, HttpServletRequest request) {
         UserVO loginUser = getLoginUser(request);
         if (!loginUser.getUserRole().equals(UserRoleEnum.ADMIN.getCode()) || !userUpdateRequest.getId().equals(loginUser.getId())) {
             throw new BusinessException(StatusCode.NO_AUTH_ERROR, "操作无权限");

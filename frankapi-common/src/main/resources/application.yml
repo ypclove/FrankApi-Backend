@@ -25,7 +25,7 @@ spring:
   redis:
     database: 0
     host: xxxxxxxx
-    port: xxxxxxxx
+    port: 6379
     # password: xxxxxxxx
     timeout: 86400
   #  邮箱配置

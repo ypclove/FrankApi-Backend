@@ -1,8 +1,10 @@
 package com.frank.apibackstage.service;
 
+import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.frank.apibackstage.model.dto.interfaceinfo.InterfaceInfoAddRequest;
 import com.frank.apibackstage.model.dto.interfaceinfo.InterfaceInfoUpdateRequest;
+import com.frank.apibackstage.model.dto.interfaceinfo.InvokeRequest;
 import com.frank.apibackstage.model.entity.InterfaceInfo;
 
 import javax.servlet.http.HttpServletRequest;
@@ -39,4 +41,13 @@ public interface InterfaceInfoService extends IService<InterfaceInfo> {
      * @return 更新接口是否成功
      */
     Boolean updateInterface(InterfaceInfoUpdateRequest interfaceInfoUpdateRequest, HttpServletRequest request);
+
+    /**
+     * 调用接口
+     *
+     * @param invokeRequest 调用接口请求
+     * @param request       HttpServletRequest
+     * @return 接口响应
+     */
+    JSONObject invokeInterface(InvokeRequest invokeRequest, HttpServletRequest request);
 }

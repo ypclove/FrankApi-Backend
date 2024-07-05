@@ -13,7 +13,7 @@ import java.io.Serializable;
 @Data
 public class FileVo implements Serializable {
 
-    private static final long serialVersionUID = -4296258656223039373L;
+    private static final long serialVersionUID = 1L;
 
     /**
      * 文件 Id

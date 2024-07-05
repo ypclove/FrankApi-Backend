@@ -1,9 +1,8 @@
-package com.frank.apibackstage.model.request;
+package com.frank.apibackstage.model.validgroup;
 
 import com.frank.apibackstage.annotation.EnumCheck;
 import com.frank.apibackstage.annotation.PasswordMatches;
 import com.frank.apibackstage.annotation.ValidInvitationCode;
-import com.frank.apibackstage.model.validgroup.UserValidGroup;
 import com.frank.apicommon.common.PageRequest;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
@@ -14,7 +13,7 @@ import javax.validation.constraints.*;
 import java.io.Serializable;
 
 /**
- * 用户信息（脱敏）
+ * 用户请求
  *
  * @author Frank
  * @date 2024/6/22

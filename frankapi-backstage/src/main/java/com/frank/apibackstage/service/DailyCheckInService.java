@@ -5,7 +5,7 @@ import com.frank.apibackstage.model.entity.DailyCheckIn;
 
 /**
  * @author Frank
- * @data 2024/06/22
+ * @date 2024/06/22
  */
 public interface DailyCheckInService extends IService<DailyCheckIn> {
 

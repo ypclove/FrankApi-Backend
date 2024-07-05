@@ -1,0 +1,16 @@
+server:
+  port: 7525
+  servlet:
+    context-path: /api
+spring:
+  profiles:
+    active: dev
+  mvc:
+    path match:
+      matching-strategy: ant_path_matcher
+frank:
+  api:
+    client:
+      access-key: xxxxxxxx
+      secret-key: xxxxxxxx
+

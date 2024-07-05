@@ -18,7 +18,7 @@ import java.io.Serializable;
 @EqualsAndHashCode(callSuper = true)
 public class InterfaceInfoSearchTextRequest extends PageRequest implements Serializable {
 
-    private static final long serialVersionUID = -6337349622479990038L;
+    private static final long serialVersionUID = 1L;
 
     @Schema(description = "搜索文本", requiredMode = Schema.RequiredMode.REQUIRED, example = "壁纸")
     @NotEmpty(message = "搜索文本不能为空")

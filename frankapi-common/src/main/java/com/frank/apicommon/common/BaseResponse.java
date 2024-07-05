@@ -9,12 +9,12 @@ import java.io.Serializable;
  * 由三部分组成：状态码，响应数据，提示消息
  *
  * @author Frank
- * @data 2024/06/22
+ * @date 2024/06/22
  */
 @Data
 public class BaseResponse<T> implements Serializable {
 
-    private static final long serialVersionUID = -1693660536490703953L;
+    private static final long serialVersionUID = 1L;
 
     /**
      * 状态码

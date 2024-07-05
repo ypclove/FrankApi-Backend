@@ -6,7 +6,7 @@ import lombok.Data;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;
-import java.util.List;
+import java.util.Map;
 
 /**
  * 接口调用请求
@@ -25,22 +25,6 @@ public class InvokeRequest implements Serializable {
     private Long id;
 
     @Schema(description = "接口请求参数", requiredMode = Schema.RequiredMode.NOT_REQUIRED, example = "id")
-    private List<Field> requestParams;
-
-    @Schema(description = "用户请求参数", requiredMode = Schema.RequiredMode.NOT_REQUIRED, example = "id")
-    private String userRequestParams;
-
-    @Data
-    public static class Field {
-        /**
-         * 接口请求参数名称
-         */
-        private String fieldName;
-
-        /**
-         * 接口请求参数值
-         */
-        private String value;
-    }
+    private Map<String, String> requestParams;
 }
 

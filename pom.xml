@@ -20,6 +20,8 @@
     <modules>
         <module>frankapi-backstage</module>
         <module>frankapi-common</module>
+        <module>frankapi-interface</module>
+        <module>frankapi-gateway</module>
     </modules>
 
     <properties>
@@ -28,6 +30,7 @@
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <maven-compiler-plugin.version>3.8.1</maven-compiler-plugin.version>
         <spring-boot-dependencies.version>2.7.2</spring-boot-dependencies.version>
+        <spring-cloud-gateway.version>3.1.3</spring-cloud-gateway.version>
 
         <!--DB相关-->
         <mybatis-plus.version>3.5.2</mybatis-plus.version>
@@ -47,6 +50,8 @@
         <dubbo.version>3.0.9</dubbo.version>
         <nacos-client.version>2.1.0</nacos-client.version>
         <mapstruct.version>1.5.5.Final</mapstruct.version>
+        <commons-httpclient.version>3.1</commons-httpclient.version>
+        <FrankApi-SDK.version>0.0.1</FrankApi-SDK.version>
 
         <!--移动支付-->
         <weixin-java-pay.version>4.5.0</weixin-java-pay.version>
@@ -56,7 +61,6 @@
         <!--第三方云服务-->
         <cos_api.version>5.6.97</cos_api.version>
         <EasyWeb.version>0.0.5</EasyWeb.version>
-        <qi-api-sdk.version>0.0.4</qi-api-sdk.version>
     </properties>
 
     <dependencyManagement>
@@ -68,6 +72,11 @@
                 <version>${spring-boot-dependencies.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.cloud</groupId>
+                <artifactId>spring-cloud-starter-gateway</artifactId>
+                <version>${spring-cloud-gateway.version}</version>
             </dependency>
 
             <!--DB相关-->
@@ -81,16 +90,16 @@
                 <artifactId>mybatis-plus-generator</artifactId>
                 <version>${mybatis-plus.version}</version>
             </dependency>
-            <!--            <dependency>-->
-            <!--                <groupId>org.apache.velocity</groupId>-->
-            <!--                <artifactId>velocity-engine-core</artifactId>-->
-            <!--                <version>${velocity.version}</version>-->
-            <!--            </dependency>-->
-            <!--            <dependency>-->
-            <!--                <groupId>org.freemarker</groupId>-->
-            <!--                <artifactId>freemarker</artifactId>-->
-            <!--                <version>${freemarker.version}</version>-->
-            <!--            </dependency>-->
+            <!--<dependency>-->
+            <!--    <groupId>org.apache.velocity</groupId>-->
+            <!--    <artifactId>velocity-engine-core</artifactId>-->
+            <!--    <version>${velocity.version}</version>-->
+            <!--</dependency>-->
+            <!--<dependency>-->
+            <!--    <groupId>org.freemarker</groupId>-->
+            <!--    <artifactId>freemarker</artifactId>-->
+            <!--    <version>${freemarker.version}</version>-->
+            <!--</dependency>-->
             <dependency>
                 <groupId>org.redisson</groupId>
                 <artifactId>redisson</artifactId>
@@ -159,6 +168,11 @@
                 <artifactId>mapstruct-processor</artifactId>
                 <version>${mapstruct.version}</version>
             </dependency>
+            <dependency>
+                <groupId>commons-httpclient</groupId>
+                <artifactId>commons-httpclient</artifactId>
+                <version>${commons-httpclient.version}</version>
+            </dependency>
 
             <!--移动支付-->
             <dependency>
@@ -171,6 +185,11 @@
                 <artifactId>IJPay-AliPay</artifactId>
                 <version>${ijpay-alipay.version}</version>
             </dependency>
+            <dependency>
+                <groupId>com.frank</groupId>
+                <artifactId>FrankApi-SDK</artifactId>
+                <version>${FrankApi-SDK.version}</version>
+            </dependency>
 
             <!--第三方云服务-->
             <dependency>
@@ -182,11 +201,6 @@
                 <groupId>icu.qimuu</groupId>
                 <artifactId>EasyWeb</artifactId>
                 <version>${EasyWeb.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>icu.qimuu</groupId>
-                <artifactId>qi-api-sdk</artifactId>
-                <version>${qi-api-sdk.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

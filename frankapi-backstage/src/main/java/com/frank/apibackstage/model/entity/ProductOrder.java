@@ -12,7 +12,7 @@ import java.util.Date;
  * 商品订单
  *
  * @author Frank
- * @data 2024/06/22
+ * @date 2024/06/22
  */
 @Getter
 @Setter
@@ -25,7 +25,7 @@ public class ProductOrder implements Serializable {
     /**
      * id
      */
-    @TableId(value = "id", type = IdType.ASSIGN_ID)
+    @TableId(value = "id", type = IdType.AUTO)
     private Long id;
 
     /**

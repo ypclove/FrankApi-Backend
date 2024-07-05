@@ -5,7 +5,7 @@ import com.frank.apibackstage.model.entity.RechargeActivity;
 
 /**
  * @author Frank
- * @data 2024/06/22
+ * @date 2024/06/22
  */
 public interface RechargeActivityService extends IService<RechargeActivity> {
 

@@ -1,0 +1,31 @@
+server:
+  port: 7527
+spring:
+  cloud:
+    gateway:
+      routes:
+        - id: xxxxxxxx
+          uri: http://localhost:8080
+          predicates:
+            - Path=/api/**
+  redis:
+    port: 6379
+    host: xxxxxxxx
+    database: 0
+logging:
+  level:
+    org:
+      springframework:
+        cloud:
+          gateway: trace
+dubbo:
+  application:
+    qosEnable: false
+    enable-file-cache: false
+    name: dubbo-springboot-demo-provider
+  protocol:
+    name: dubbo
+    port: -1
+  registry:
+    id: nacos-registry
+    address: xxxxxxxx

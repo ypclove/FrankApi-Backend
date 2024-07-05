@@ -11,7 +11,7 @@ import java.util.Date;
  * 用户
  *
  * @author Frank
- * @data 2024/06/22
+ * @date 2024/06/22
  */
 @Data
 @Accessors(chain = true)
@@ -23,7 +23,7 @@ public class User implements Serializable {
     /**
      * id
      */
-    @TableId(value = "id", type = IdType.ASSIGN_ID)
+    @TableId(value = "id", type = IdType.AUTO)
     private Long id;
 
     /**

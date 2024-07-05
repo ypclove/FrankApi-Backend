@@ -73,6 +73,12 @@ public class InterfaceInfo implements Serializable {
     private String requestExample;
 
     /**
+     * 响应示例
+     */
+    @TableField("responseExample")
+    private String responseExample;
+
+    /**
      * 请求头
      */
     @TableField("requestHeader")

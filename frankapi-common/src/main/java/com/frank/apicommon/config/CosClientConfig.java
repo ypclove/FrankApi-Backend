@@ -15,7 +15,7 @@ import org.springframework.context.annotation.Configuration;
  * 腾讯云对象存储客户端
  *
  * @author Frank
- * @data 2024/06/22
+ * @date 2024/06/22
  */
 @Data
 @Configuration

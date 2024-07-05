@@ -5,9 +5,9 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.plugins.pagination.PageDTO;
 import com.frank.apibackstage.annotation.AuthCheck;
 import com.frank.apibackstage.annotation.Encrypt;
+import com.frank.apibackstage.model.convert.UserConvert;
+import com.frank.apibackstage.model.dto.user.*;
 import com.frank.apibackstage.model.entity.User;
-import com.frank.apibackstage.model.request.UserRequest;
-import com.frank.apibackstage.model.validgroup.UserValidGroup;
 import com.frank.apibackstage.model.vo.UserVO;
 import com.frank.apibackstage.service.UserService;
 import com.frank.apicommon.common.BaseResponse;
@@ -27,10 +27,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
-import javax.validation.constraints.Email;
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.Pattern;
-import javax.validation.constraints.Size;
+import javax.validation.constraints.*;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -39,7 +36,7 @@ import static com.frank.apicommon.constant.RedisConstant.CAPTCHA_CACHE_KEY;
 
 /**
  * @author Frank
- * @data 2024/06/22
+ * @date 2024/06/22
  */
 @Slf4j
 @Validated
@@ -60,8 +57,7 @@ public class UserController {
      * @return 用户 Id
      */
     @PostMapping("/register")
-    public BaseResponse<Long> userRegister(@Validated(value = UserValidGroup.Register.PlateRegister.class)
-                                           @RequestBody UserRequest userRegisterRequest) {
+    public BaseResponse<Long> userRegister(@Valid @RequestBody UserRegisterRequest userRegisterRequest) {
         Long userId = userService.userRegister(userRegisterRequest);
         return ResultUtils.success(userId);
     }
@@ -73,8 +69,7 @@ public class UserController {
      * @return 用户 Id
      */
     @PostMapping("/email/register")
-    public BaseResponse<Long> userEmailRegister(@Validated(value = UserValidGroup.Register.EmailRegister.class)
-                                                @RequestBody UserRequest userEmailRegisterRequest) {
+    public BaseResponse<Long> userEmailRegister(@Valid @RequestBody UserEmailRegisterRequest userEmailRegisterRequest) {
         Long result = userService.userEmailRegister(userEmailRegisterRequest);
         redisTemplate.delete(CAPTCHA_CACHE_KEY + userEmailRegisterRequest.getEmailAccount());
         return ResultUtils.success(result);
@@ -89,8 +84,8 @@ public class UserController {
      */
     @Encrypt
     @PostMapping("/login")
-    public BaseResponse<UserVO> userLogin(@Validated(value = UserValidGroup.Login.PlateLogin.class)
-                                          @RequestBody UserRequest userLoginRequest, HttpServletRequest request) {
+    public BaseResponse<UserVO> userLogin(@Valid @RequestBody UserLoginRequest userLoginRequest,
+                                          HttpServletRequest request) {
         UserVO userVO = userService.userLogin(userLoginRequest.getUserAccount(), userLoginRequest.getUserPassword(), request);
         return ResultUtils.success(userVO);
     }
@@ -103,8 +98,8 @@ public class UserController {
      * @return 登录的用户信息
      */
     @PostMapping("/email/login")
-    public BaseResponse<UserVO> userEmailLogin(@Validated(value = UserValidGroup.Login.EmailLogin.class)
-                                               @RequestBody UserRequest userEmailLoginRequest, HttpServletRequest request) {
+    public BaseResponse<UserVO> userEmailLogin(@Valid @RequestBody UserEmailLoginRequest userEmailLoginRequest,
+                                               HttpServletRequest request) {
         UserVO userVO = userService.userEmailLogin(userEmailLoginRequest, request);
         redisTemplate.delete(CAPTCHA_CACHE_KEY + userEmailLoginRequest.getEmailAccount());
         return ResultUtils.success(userVO);
@@ -133,8 +128,7 @@ public class UserController {
      * @return 用户信息
      */
     @PostMapping("/bindEmail")
-    public BaseResponse<UserVO> userBindEmail(@Validated(value = UserValidGroup.EmailBind.BindEmail.class)
-                                              @RequestBody UserRequest userBindEmailRequest,
+    public BaseResponse<UserVO> userBindEmail(@Valid @RequestBody UserBindEmailRequest userBindEmailRequest,
                                               HttpServletRequest request) {
         UserVO userVO = userService.userBindEmail(userBindEmailRequest, request);
         return ResultUtils.success(userVO);
@@ -148,8 +142,7 @@ public class UserController {
      * @return 用户信息
      */
     @PostMapping("/unbindEmail")
-    public BaseResponse<UserVO> userUnBindEmail(@Validated(value = UserValidGroup.EmailBind.UnBindEmail.class)
-                                                @RequestBody UserRequest userUnBindEmailRequest,
+    public BaseResponse<UserVO> userUnBindEmail(@Valid @RequestBody UserUnBindEmailRequest userUnBindEmailRequest,
                                                 HttpServletRequest request) {
         UserVO userVO = userService.userUnBindEmail(userUnBindEmailRequest, request);
         redisTemplate.delete(CAPTCHA_CACHE_KEY + userUnBindEmailRequest.getEmailAccount());
@@ -165,9 +158,7 @@ public class UserController {
     @GetMapping("/get/login")
     public BaseResponse<UserVO> getLoginUser(HttpServletRequest request) {
         UserVO user = userService.getLoginUser(request);
-        UserVO userVO = new UserVO();
-        BeanUtils.copyProperties(user, userVO);
-        return ResultUtils.success(userVO);
+        return ResultUtils.success(user);
     }
 
     /**
@@ -193,8 +184,7 @@ public class UserController {
      */
     @PostMapping("/add")
     @AuthCheck(mustRole = 0)
-    public BaseResponse<Long> addUser(@Validated(value = UserValidGroup.Crud.Create.class)
-                                      @RequestBody UserRequest userAddRequest) {
+    public BaseResponse<Long> addUser(@Valid @RequestBody UserAddRequest userAddRequest) {
         Long userId = userService.addUser(userAddRequest);
         return ResultUtils.success(userId);
     }
@@ -202,18 +192,20 @@ public class UserController {
     /**
      * 删除用户
      *
-     * @param userDeleteRequest 删除用户请求
+     * @param userId 用户 Id
      * @return 删除用户是否成功
      */
-    @DeleteMapping("/delete")
+    @DeleteMapping("/delete/{userId}")
     @AuthCheck(mustRole = 0)
-    public BaseResponse<Boolean> deleteUser(@Validated(value = UserValidGroup.Crud.Delete.class)
-                                            @RequestBody UserRequest userDeleteRequest) {
-        User user = userService.getById(userDeleteRequest.getId());
+    public BaseResponse<Boolean> deleteUser(@PathVariable @Valid
+                                            @NotNull(message = "用户 Id 不能为空")
+                                            @Min(value = 1L, message = "用户 Id 错误")
+                                            Long userId) {
+        User user = userService.getById(userId);
         if (Objects.isNull(user)) {
             throw new BusinessException(StatusCode.NOT_FOUND_ERROR);
         }
-        boolean result = userService.removeById(userDeleteRequest.getId());
+        boolean result = userService.removeById(userId);
         if (!result) {
             throw new BusinessException(StatusCode.OPERATION_ERROR, "删除用户失败");
         }
@@ -230,8 +222,8 @@ public class UserController {
     @PostMapping("/update")
     @AuthCheck(mustRole = 0)
     @Transactional(rollbackFor = Exception.class)
-    public BaseResponse<UserVO> updateUser(@Validated(value = UserValidGroup.Crud.Update.class)
-                                           @RequestBody UserRequest userUpdateRequest, HttpServletRequest request) {
+    public BaseResponse<UserVO> updateUser(@Valid @RequestBody UserUpdateRequest userUpdateRequest,
+                                           HttpServletRequest request) {
         UserVO userVO = userService.updateUser(userUpdateRequest, request);
         return ResultUtils.success(userVO);
     }
@@ -239,18 +231,19 @@ public class UserController {
     /**
      * 根据 Id 查询用户
      *
-     * @param userQueryRequest 用户查询请求
+     * @param userId 用户 Id
      * @return 用户信息
      */
-    @GetMapping("/get/")
-    public BaseResponse<UserVO> getUserById(@Validated(value = UserValidGroup.Crud.Query.class)
-                                            @RequestBody UserRequest userQueryRequest) {
-        User user = userService.getById(userQueryRequest.getId());
+    @GetMapping("/get/{userId}")
+    public BaseResponse<UserVO> getUserById(@Valid @PathVariable
+                                            @NotNull(message = "用户 Id 不能为空")
+                                            @Min(value = 1L, message = "用户 Id 错误")
+                                            Long userId) {
+        User user = userService.getById(userId);
         if (Objects.isNull(user)) {
             throw new BusinessException(StatusCode.OPERATION_ERROR, "查询用户失败");
         }
-        UserVO userVO = new UserVO();
-        BeanUtils.copyProperties(user, userVO);
+        UserVO userVO = UserConvert.INSTANCE.convert(user);
         return ResultUtils.success(userVO);
     }
 
@@ -261,7 +254,7 @@ public class UserController {
      * @return 用户分页列表
      */
     @GetMapping("/list/page")
-    public BaseResponse<Page<UserVO>> getUserListByPage(UserRequest userQueryRequest) {
+    public BaseResponse<Page<UserVO>> getUserListByPage(UserQueryRequest userQueryRequest) {
         User userQuery = new User();
 
         if (userQueryRequest == null) {
@@ -282,11 +275,11 @@ public class UserController {
                 .eq(ObjectUtils.anyNotNull(userRole), "userRole", userRole);
         Page<User> userPage = userService.page(new Page<>(current, pageSize), queryWrapper);
         Page<UserVO> userVoPage = new PageDTO<>(userPage.getCurrent(), userPage.getSize(), userPage.getTotal());
-        List<UserVO> userVOList = userPage.getRecords().stream().map(user -> {
-            UserVO userVO = new UserVO();
-            BeanUtils.copyProperties(user, userVO);
-            return userVO;
-        }).collect(Collectors.toList());
+        List<UserVO> userVOList = userPage
+                .getRecords()
+                .stream()
+                .map(UserConvert.INSTANCE::convert)
+                .collect(Collectors.toList());
         userVoPage.setRecords(userVOList);
         return ResultUtils.success(userVoPage);
     }
@@ -294,14 +287,16 @@ public class UserController {
     /**
      * 封号
      *
-     * @param userBanRequest 用户封禁请求
+     * @param userId 用户 Id
      * @return 封号是否成功
      */
-    @PostMapping("/ban/")
+    @PostMapping("/ban/{userId}")
     @AuthCheck(mustRole = 0)
-    public BaseResponse<Boolean> banUser(@Validated(value = UserValidGroup.Crud.Delete.class)
-                                         @RequestBody UserRequest userBanRequest) {
-        User user = userService.getById(userBanRequest.getId());
+    public BaseResponse<Boolean> banUser(@Valid @PathVariable
+                                         @NotNull(message = "用户 Id 不能为空")
+                                         @Min(value = 1L, message = "用户 Id 错误")
+                                         Long userId) {
+        User user = userService.getById(userId);
         if (Objects.isNull(user)) {
             throw new BusinessException(StatusCode.NOT_FOUND_ERROR);
         }
@@ -312,14 +307,16 @@ public class UserController {
     /**
      * 解封
      *
-     * @param userUnBanRequest 用户解封请求
+     * @param userId 用户 Id
      * @return 解封是否成功
      */
     @AuthCheck(mustRole = 0)
-    @PostMapping("/normal")
-    public BaseResponse<Boolean> normalUser(@Validated(value = UserValidGroup.Crud.Delete.class)
-                                            @RequestBody UserRequest userUnBanRequest) {
-        User user = userService.getById(userUnBanRequest.getId());
+    @PostMapping("/normal/{userId}")
+    public BaseResponse<Boolean> normalUser(@Valid @PathVariable
+                                            @NotNull(message = "用户 Id 不能为空")
+                                            @Min(value = 1L, message = "用户 Id 错误")
+                                            Long userId) {
+        User user = userService.getById(userId);
         if (Objects.isNull(user)) {
             throw new BusinessException(StatusCode.NOT_FOUND_ERROR);
         }

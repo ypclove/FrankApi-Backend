@@ -25,7 +25,7 @@ import static com.frank.apicommon.constant.UserConstant.USER_DAILY_CHECK_IN;
 
 /**
  * @author Frank
- * @data 2024/06/22
+ * @date 2024/06/22
  */
 @Slf4j
 @Validated

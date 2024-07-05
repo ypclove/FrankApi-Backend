@@ -12,7 +12,7 @@ import java.util.List;
  */
 @Data
 public class OrderVo implements Serializable {
-    private static final long serialVersionUID = -7340958009391771093L;
+    private static final long serialVersionUID = 1L;
     private List<ProductOrderVo> records;
     private long total;
     private long size;

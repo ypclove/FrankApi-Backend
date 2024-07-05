@@ -16,7 +16,7 @@ import java.io.Serializable;
 @EqualsAndHashCode(callSuper = true)
 public class ProductInfoSearchTextRequest extends PageRequest implements Serializable {
 
-    private static final long serialVersionUID = -6337349622479990038L;
+    private static final long serialVersionUID = 1L;
 
     private String searchText;
 }

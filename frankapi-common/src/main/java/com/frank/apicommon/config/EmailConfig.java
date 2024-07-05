@@ -8,7 +8,7 @@ import org.springframework.context.annotation.Configuration;
  * 电子邮件配置
  *
  * @author Frank
- * @data 2024/06/22
+ * @date 2024/06/22
  */
 @Data
 @Configuration

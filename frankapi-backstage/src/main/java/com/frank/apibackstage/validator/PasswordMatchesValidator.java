@@ -1,7 +1,7 @@
 package com.frank.apibackstage.validator;
 
 import com.frank.apibackstage.annotation.PasswordMatches;
-import com.frank.apibackstage.model.request.UserRequest;
+import com.frank.apibackstage.model.validgroup.UserRequest;
 
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
